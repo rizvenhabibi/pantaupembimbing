@@ -72,9 +72,13 @@ async function login() {
     for (let line of lines) {
       if (!line) continue;
 
+    //  const cols = line.split(",");
+   //   const user = cols[0]?.trim();
+     // const hash = cols.slice(1).join(",").trim();
+    //  const nama = cols[2]?.trim();
       const cols = line.split(",");
       const user = cols[0]?.trim();
-      const hash = cols.slice(1).join(",").trim();
+      const hash = cols[1]?.trim();
       const nama = cols[2]?.trim();
       if (user === u && bcrypt.compareSync(p, hash)) {
         localStorage.setItem("login_user", u);
