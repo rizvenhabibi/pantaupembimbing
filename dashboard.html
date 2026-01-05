@@ -305,32 +305,94 @@ if (!localStorage.getItem("login_user")) {
             </div>
           </div>
         </div>
-
-        <!-- Link Foto -->
+<!-- Dokumentasi dengan Kamera -->
         <div class="form-section">
-          <h6 class="section-title">Dokumentasi</h6>
-          <div class="mb-3">
-            <label for="link_foto" class="form-label">Link Foto Dokumentasi</label>
-            <input type="url" class="form-control" id="link_foto" 
-                   placeholder="https://drive.google.com/... atau link lainnya">
-            <div class="form-text">Masukkan link Google Drive, Foto, atau dokumentasi lainnya</div>
+          <h6 class="section-title"><i class="bi bi-camera me-2"></i>Dokumentasi</h6>
+          
+          <!-- Preview Gambar -->
+          <div class="mb-3 text-center">
+            <div id="imagePreview" class="border rounded p-3 mb-3" style="display: none;">
+              <img id="previewImage" src="#" alt="Preview" class="img-fluid rounded" style="max-height: 200px;">
+              <div class="mt-2">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeImage()">
+                  <i class="bi bi-trash"></i> Hapus Foto
+                </button>
+              </div>
+            </div>
+            
+            <!-- Tombol Kamera & Upload -->
+            <div class="row g-2 mb-3">
+              <div class="col-md-6">
+                <label class="btn btn-camera w-100" for="cameraInput">
+                  <i class="bi bi-camera me-2"></i>Ambil Foto dengan Kamera
+                </label>
+                <input type="file" id="cameraInput" accept="image/*" capture="environment" 
+                       class="d-none" onchange="handleCameraCapture(event)">
+              </div>
+              <div class="col-md-6">
+                <label class="btn btn-upload w-100" for="fileInput">
+                  <i class="bi bi-upload me-2"></i>Upload Gambar dari File
+                </label>
+                <input type="file" id="fileInput" accept="image/*" 
+                       class="d-none" onchange="handleFileUpload(event)">
+              </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="progress mb-3" style="display: none;" id="uploadProgress">
+              <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                   role="progressbar" style="width: 0%">0%</div>
+            </div>
+            
+            <!-- Link Input -->
+            <div class="mb-3">
+              <label for="link_foto" class="form-label">Link Foto Dokumentasi</label>
+              <div class="input-group">
+                <input type="url" class="form-control" id="link_foto" 
+                       placeholder="Link akan otomatis terisi setelah upload..." readonly>
+                <button class="btn btn-outline-primary" type="button" onclick="copyLink()" title="Salin link">
+                  <i class="bi bi-clipboard"></i>
+                </button>
+              </div>
+              <div class="form-text">
+                <span id="uploadStatus">Belum ada gambar</span>
+                <span id="fileSize" class="ms-2 text-muted"></span>
+              </div>
+            </div>
           </div>
         </div>
 
         <!-- Submit Button -->
-        <div class="text-center mt-4">
+        <div class="text-center mt-4 pt-3 border-top">
           <button type="submit" class="btn btn-submit text-white">
             <i class="bi bi-send-check me-2"></i>
             <span id="submitText">Kirim Data Monitoring</span>
             <span id="loadingSpinner" class="spinner-border spinner-border-sm ms-2 d-none"></span>
           </button>
+          <button type="button" class="btn btn-outline-secondary ms-2" onclick="resetForm()">
+            <i class="bi bi-arrow-clockwise me-2"></i>Reset Form
+          </button>
         </div>
       </form>
     </div>
   </div>
+  
+  <!-- Footer -->
+  <div class="text-center text-muted mt-4 mb-5">
+    <small>
+      <i class="bi bi-shield-check me-1"></i>Data dikirim ke Google Forms secara aman
+      • © 2024 Monitoring Prakerin
+    </small>
+  </div>
 </div>
 
+<!-- =============================== JAVASCRIPT LENGKAP =============================== -->
 <script>
+// ==================== 1. PROTECT PAGE & SESSION ====================
+if (!localStorage.getItem("login_user")) {
+  location.href = "index.html";
+}
+
 // Set nama guru
 document.getElementById("namaGuru").innerText = localStorage.getItem("login_name") || "Guru";
 
@@ -338,45 +400,37 @@ document.getElementById("namaGuru").innerText = localStorage.getItem("login_name
 const MAX_SESSION = 30 * 60 * 1000; // 30 menit
 const loginTime = localStorage.getItem("login_time");
 
-if (!localStorage.getItem("login_user") || !loginTime) {
-  location.href = "index.html";
-}
-
-if (Date.now() - loginTime > MAX_SESSION) {
+if (!loginTime || Date.now() - loginTime > MAX_SESSION) {
   logout();
 }
 
-// Reset session timer
+// Update session timer
+function updateSessionTimer() {
+  const elapsed = Date.now() - (parseInt(loginTime) || Date.now());
+  const remaining = Math.max(0, MAX_SESSION - elapsed);
+  const minutes = Math.floor(remaining / 60000);
+  const seconds = Math.floor((remaining % 60000) / 1000);
+  
+  document.getElementById("sessionTimer").textContent = 
+    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  
+  if (remaining <= 0) logout();
+}
+setInterval(updateSessionTimer, 1000);
+
+// Reset timer on activity
 ["click","mousemove","keydown"].forEach(evt => {
   document.addEventListener(evt, () => {
     localStorage.setItem("login_time", Date.now());
   });
 });
 
-// Session timer display
-function updateSessionTimer() {
-  const elapsed = Date.now() - loginTime;
-  const remaining = Math.max(0, MAX_SESSION - elapsed);
-  const minutes = Math.floor(remaining / 60000);
-  const seconds = Math.floor((remaining % 60000) / 1000);
-  
-  document.getElementById("sessionTimer").textContent = 
-    `Sesi: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  
-  if (remaining <= 0) logout();
-}
-setInterval(updateSessionTimer, 1000);
-
-// Isi opsi tanggal
-function populateDays() {
-  const daySelect = document.getElementById('tanggal');
-  daySelect.innerHTML = '<option value="">Pilih Tanggal</option>';
-  for (let i = 1; i <= 31; i++) {
-    const day = i.toString().padStart(2, '0');
-    daySelect.innerHTML += `<option value="${day}">${i}</option>`;
-  }
-}
-populateDays();
+// ==================== 2. KONFIGURASI ====================
+// GANTI DENGAN KONFIGURASI VPS ANDA!
+const VPS_CONFIG = {
+  uploadUrl: 'https://prakerin.cloud/upload.php', // URL endpoint upload di VPS
+  baseUrl: 'https://prakerin.cloud/uploads/'      // Base URL untuk gambar
+};
 
 // Entry IDs Google Form
 const ENTRY_IDS = {
@@ -429,20 +483,196 @@ const ENTRY_IDS = {
   "tanggal": "entry.2090096464_day"
 };
 
-// Google Form ID (dari link https://forms.gle/tGB9di57V4F1B7DY6)
-// ID adalah bagian setelah /d/e/ di URL panjang
+// Google Form ID
 const GOOGLE_FORM_ID = '1FAIpQLSclDH_24SE9ECq-ti_qyQHSyBMoCsHAkRtdFT5Yrr1e7wIR4A';
 const FORM_ACTION_URL = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_ID}/formResponse`;
 
-// Handle form submission
-document.getElementById('monitoringForm').addEventListener('submit', async function(e) {
+// ==================== 3. FUNGSI UTAMA ====================
+let currentImageFile = null;
+
+// Isi opsi tanggal
+function populateDays() {
+  const daySelect = document.getElementById('tanggal');
+  daySelect.innerHTML = '<option value="">Pilih Tanggal</option>';
+  for (let i = 1; i <= 31; i++) {
+    const day = i.toString().padStart(2, '0');
+    daySelect.innerHTML += `<option value="${day}">${i}</option>`;
+  }
+}
+
+// Handle kamera
+function handleCameraCapture(event) {
+  const file = event.target.files[0];
+  if (file) {
+    previewImage(file);
+    uploadToVPS(file);
+  }
+}
+
+// Handle upload file
+function handleFileUpload(event) {
+  const file = event.target.files[0];
+  if (file) {
+    // Validasi ukuran (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Ukuran file terlalu besar! Maksimal 5MB.');
+      return;
+    }
+    previewImage(file);
+    uploadToVPS(file);
+  }
+}
+
+// Preview gambar
+function previewImage(file) {
+  currentImageFile = file;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('previewImage').src = e.target.result;
+    document.getElementById('imagePreview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+  
+  // Tampilkan info file
+  const fileSize = (file.size / 1024).toFixed(2);
+  document.getElementById('fileSize').textContent = `(${fileSize} KB)`;
+}
+
+// Hapus gambar
+function removeImage() {
+  currentImageFile = null;
+  document.getElementById('imagePreview').style.display = 'none';
+  document.getElementById('link_foto').value = '';
+  document.getElementById('uploadStatus').textContent = 'Belum ada gambar';
+  document.getElementById('fileSize').textContent = '';
+  document.getElementById('cameraInput').value = '';
+  document.getElementById('fileInput').value = '';
+}
+
+// Upload ke VPS
+async function uploadToVPS(file) {
+  const progressBar = document.getElementById('uploadProgress');
+  const progressBarInner = progressBar.querySelector('.progress-bar');
+  const uploadStatus = document.getElementById('uploadStatus');
+  const linkInput = document.getElementById('link_foto');
+  
+  // Tampilkan progress
+  progressBar.style.display = 'block';
+  uploadStatus.textContent = 'Mengupload...';
+  uploadStatus.className = 'text-info';
+  linkInput.value = '';
+  
+  try {
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('timestamp', Date.now());
+    formData.append('uploader', localStorage.getItem('login_name') || 'guru');
+    
+    const xhr = new XMLHttpRequest();
+    
+    // Track progress
+    xhr.upload.addEventListener('progress', function(e) {
+      if (e.lengthComputable) {
+        const percent = Math.round((e.loaded / e.total) * 100);
+        progressBarInner.style.width = percent + '%';
+        progressBarInner.textContent = percent + '%';
+      }
+    });
+    
+    // Handle response
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          try {
+            const response = JSON.parse(xhr.responseText);
+            if (response.success && response.imageUrl) {
+              linkInput.value = response.imageUrl;
+              uploadStatus.textContent = 'Upload berhasil!';
+              uploadStatus.className = 'text-success';
+              
+              // Simpan ke localStorage
+              localStorage.setItem('last_upload', JSON.stringify({
+                url: response.imageUrl,
+                time: new Date().toISOString()
+              }));
+            } else {
+              throw new Error(response.message || 'Upload gagal');
+            }
+          } catch (e) {
+            uploadStatus.textContent = 'Error membaca respons server';
+            uploadStatus.className = 'text-danger';
+          }
+        } else {
+          uploadStatus.textContent = `Server error ${xhr.status}`;
+          uploadStatus.className = 'text-danger';
+        }
+        
+        // Sembunyikan progress bar
+        setTimeout(() => {
+          progressBar.style.display = 'none';
+        }, 1500);
+      }
+    };
+    
+    xhr.open('POST', VPS_CONFIG.uploadUrl, true);
+    xhr.send(formData);
+    
+  } catch (error) {
+    console.error('Upload error:', error);
+    uploadStatus.textContent = 'Error: ' + error.message;
+    uploadStatus.className = 'text-danger';
+    progressBar.style.display = 'none';
+  }
+}
+
+// Copy link
+function copyLink() {
+  const linkInput = document.getElementById('link_foto');
+  if (linkInput.value) {
+    navigator.clipboard.writeText(linkInput.value)
+      .then(() => {
+        alert('Link berhasil disalin ke clipboard!');
+      })
+      .catch(() => {
+        // Fallback untuk browser lama
+        linkInput.select();
+        document.execCommand('copy');
+        alert('Link disalin!');
+      });
+  }
+}
+
+// Reset form
+function resetForm() {
+  if (confirm('Apakah Anda yakin ingin mengosongkan semua data?')) {
+    document.getElementById('monitoringForm').reset();
+    removeImage();
+    populateDays();
+    document.getElementById('successAlert').classList.add('d-none');
+    document.getElementById('errorAlert').classList.add('d-none');
+  }
+}
+
+// ==================== 4. SUBMIT KE GOOGLE FORMS ====================
+document.getElementById('monitoringForm').addEventListener('submit', function(e) {
   e.preventDefault();
+  
+  // Validasi wajib
+  const requiredFields = ['nama', 'kompetensi', 'nama_perusahaan', 'alamat_perusahaan'];
+  for (const field of requiredFields) {
+    const value = document.getElementById(field).value.trim();
+    if (!value) {
+      alert(`Field "${field.replace('_', ' ')}" harus diisi!`);
+      document.getElementById(field).focus();
+      return;
+    }
+  }
   
   // Tampilkan loading
   document.getElementById('submitText').classList.add('d-none');
   document.getElementById('loadingSpinner').classList.remove('d-none');
   
-  // Sembunyikan alert sebelumnya
+  // Sembunyikan alert lama
   document.getElementById('successAlert').classList.add('d-none');
   document.getElementById('errorAlert').classList.add('d-none');
   
@@ -456,59 +686,94 @@ document.getElementById('monitoringForm').addEventListener('submit', async funct
       }
     });
     
-    // Validasi required fields
-    if (!formData.nama || !formData.kompetensi || !formData.nama_perusahaan || !formData.alamat_perusahaan) {
-      throw new Error('Harap isi field yang wajib diisi: Nama, Kompetensi, Nama Perusahaan, Alamat Perusahaan');
-    }
+    // Buat form tersembunyi untuk submit
+    const hiddenForm = document.createElement('form');
+    hiddenForm.method = 'POST';
+    hiddenForm.action = FORM_ACTION_URL;
+    hiddenForm.target = '_blank'; // Buka di tab baru
+    hiddenForm.style.display = 'none';
     
-    // Buat URL parameters
-    const params = new URLSearchParams();
-    
-    // Tambahkan semua data ke parameter
+    // Tambahkan semua input
     Object.entries(ENTRY_IDS).forEach(([fieldName, entryId]) => {
       if (formData[fieldName]) {
-        params.append(entryId, formData[fieldName]);
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = entryId;
+        input.value = formData[fieldName];
+        hiddenForm.appendChild(input);
       }
     });
     
-    // Kirim ke Google Forms
-    const response = await fetch(FORM_ACTION_URL, {
-      method: 'POST',
-      mode: 'no-cors', // Penting untuk Google Forms
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: params.toString()
-    });
+    // Submit menggunakan iframe
+    const iframe = document.createElement('iframe');
+    iframe.name = 'googleformiframe';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+    hiddenForm.target = 'googleformiframe';
+    document.body.appendChild(hiddenForm);
+    hiddenForm.submit();
     
-    // Tampilkan sukses
-    document.getElementById('successAlert').classList.remove('d-none');
-    
-    // Reset form (opsional)
-    document.getElementById('monitoringForm').reset();
-    populateDays(); // Reset tanggal
-    
-    // Scroll ke atas
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Tampilkan pesan sukses
+    setTimeout(() => {
+      document.getElementById('successAlert').classList.remove('d-none');
+      document.getElementById('submitText').classList.remove('d-none');
+      document.getElementById('loadingSpinner').classList.add('d-none');
+      
+      // Reset form setelah 2 detik
+      setTimeout(() => {
+        resetForm();
+        document.body.removeChild(hiddenForm);
+        document.body.removeChild(iframe);
+      }, 2000);
+      
+      // Scroll ke atas
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 1000);
     
   } catch (error) {
-    // Tampilkan error
+    console.error('Submit error:', error);
     document.getElementById('errorMessage').textContent = error.message;
     document.getElementById('errorAlert').classList.remove('d-none');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  } finally {
-    // Sembunyikan loading
     document.getElementById('submitText').classList.remove('d-none');
     document.getElementById('loadingSpinner').classList.add('d-none');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 });
 
+// ==================== 5. FUNGSI LOGOUT ====================
 function logout() {
   localStorage.removeItem("login_user");
   localStorage.removeItem("login_name");
   localStorage.removeItem("login_time");
   location.href = "index.html";
 }
+
+// ==================== 6. INISIALISASI ====================
+// Jalankan saat halaman load
+document.addEventListener('DOMContentLoaded', function() {
+  populateDays();
+  
+  // Set bulan dan tanggal saat ini
+  const now = new Date();
+  document.getElementById('bulan').value = (now.getMonth() + 1).toString().padStart(2, '0');
+  document.getElementById('tanggal').value = now.getDate().toString().padStart(2, '0');
+  
+  // Load upload terakhir jika ada
+  const lastUpload = localStorage.getItem('last_upload');
+  if (lastUpload) {
+    try {
+      const data = JSON.parse(lastUpload);
+      if (data.url) {
+        document.getElementById('link_foto').value = data.url;
+        document.getElementById('uploadStatus').textContent = 'Gambar terakhir diupload: ' + 
+          new Date(data.time).toLocaleTimeString();
+        document.getElementById('uploadStatus').className = 'text-success';
+      }
+    } catch (e) {
+      // Ignore error
+    }
+  }
+});
 </script>
 </body>
 </html>
