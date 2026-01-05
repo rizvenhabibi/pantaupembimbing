@@ -2,9 +2,54 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard</title>
-
+  <title>Dashboard Guru - Monitoring Prakerin</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <style>
+    .card-custom {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .section-title {
+      border-left: 4px solid #0d6efd;
+      padding-left: 12px;
+      margin: 20px 0 15px 0;
+      color: #333;
+      font-weight: 600;
+    }
+    .form-section {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid #dee2e6;
+    }
+    .btn-submit {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      padding: 12px 40px;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    .btn-submit:hover {
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    .ais-row {
+      background: #e9ecef;
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    .form-label {
+      font-weight: 500;
+      color: #495057;
+    }
+    .date-input {
+      max-width: 120px;
+    }
+  </style>
 </head>
 <body>
 
@@ -17,51 +62,445 @@ if (!localStorage.getItem("login_user")) {
 
 <nav class="navbar navbar-dark bg-dark">
   <div class="container-fluid">
-    <span class="navbar-brand">Dashboard Guru</span>
-    <button class="btn btn-sm btn-outline-light" onclick="logout()">Logout</button>
+    <span class="navbar-brand">Dashboard Monitoring Prakerin</span>
+    <button class="btn btn-sm btn-outline-light" onclick="logout()">
+      <i class="bi bi-box-arrow-right me-1"></i>Logout
+    </button>
   </div>
 </nav>
 
 <div class="container mt-4">
-  <div class="alert alert-success">
-    Selamat datang, <span id="namaGuru"></span>
+  <!-- Header Welcome -->
+  <div class="alert alert-primary d-flex justify-content-between align-items-center">
+    <div>
+      <h5 class="mb-1">Selamat datang, <span id="namaGuru"></span></h5>
+      <small class="text-muted">Form Monitoring Kunjungan Prakerin</small>
+    </div>
+    <div class="text-end">
+      <small id="sessionTimer" class="text-muted">Sesi: 30:00</small>
+    </div>
   </div>
 
-  <div class="card">
+  <!-- Form Monitoring Prakerin -->
+  <div class="card card-custom">
+    <div class="card-header bg-primary text-white py-3">
+      <h5 class="card-title mb-0">
+        <i class="bi bi-clipboard-check me-2"></i>Form Monitoring Prajabatan (Prakerin)
+      </h5>
+    </div>
     <div class="card-body">
-      <p>Ini halaman dashboard.</p>
-      <p>Di sini nanti bisa ditambahkan:</p>
-      <ul>
-        <li>Form presensi</li>
-        <li>Upload CSV</li>
-        <li>Link Google Sheet</li>
-      </ul>
+      <!-- Alert Messages -->
+      <div id="successAlert" class="alert alert-success alert-dismissible fade show d-none" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <strong>Berhasil!</strong> Data monitoring telah dikirim ke Google Form.
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      
+      <div id="errorAlert" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <strong>Error!</strong> <span id="errorMessage">Terjadi kesalahan.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+
+      <form id="monitoringForm">
+        <!-- Tanggal Kunjungan -->
+        <div class="form-section">
+          <h6 class="section-title">Tanggal Kunjungan</h6>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="tahun" class="form-label">Tahun</label>
+              <select class="form-select" id="tahun">
+                <option value="">Pilih Tahun</option>
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="bulan" class="form-label">Bulan</label>
+              <select class="form-select" id="bulan">
+                <option value="">Pilih Bulan</option>
+                <option value="01">Januari</option>
+                <option value="02">Februari</option>
+                <option value="03">Maret</option>
+                <option value="04">April</option>
+                <option value="05">Mei</option>
+                <option value="06">Juni</option>
+                <option value="07">Juli</option>
+                <option value="08">Agustus</option>
+                <option value="09">September</option>
+                <option value="10">Oktober</option>
+                <option value="11">November</option>
+                <option value="12">Desember</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="tanggal" class="form-label">Tanggal</label>
+              <select class="form-select" id="tanggal">
+                <option value="">Pilih Tanggal</option>
+                <!-- JavaScript akan mengisi opsi tanggal -->
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Umum -->
+        <div class="form-section">
+          <h6 class="section-title">Data Umum</h6>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="nama" class="form-label">Nama</label>
+              <input type="text" class="form-control" id="nama" required>
+            </div>
+            <div class="col-md-6">
+              <label for="kunjungan_ke" class="form-label">Kunjungan Ke</label>
+              <input type="text" class="form-control" id="kunjungan_ke" 
+                     placeholder="Contoh: Kunjungan 1, Kunjungan 2">
+            </div>
+            <div class="col-md-12">
+              <label for="kompetensi" class="form-label">Kompetensi</label>
+              <input type="text" class="form-control" id="kompetensi" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Perusahaan -->
+        <div class="form-section">
+          <h6 class="section-title">Data Perusahaan/Iduka</h6>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="nama_perusahaan" class="form-label">Nama Perusahaan</label>
+              <input type="text" class="form-control" id="nama_perusahaan" required>
+            </div>
+            <div class="col-md-6">
+              <label for="alamat_perusahaan" class="form-label">Alamat Perusahaan</label>
+              <input type="text" class="form-control" id="alamat_perusahaan" required>
+            </div>
+            <div class="col-md-6">
+              <label for="nomor_hp" class="form-label">Nomor HP Perusahaan</label>
+              <input type="tel" class="form-control" id="nomor_hp">
+            </div>
+            <div class="col-md-6">
+              <label for="penerima" class="form-label">Nama yang Menerima</label>
+              <input type="text" class="form-control" id="penerima">
+            </div>
+            <div class="col-md-6">
+              <label for="jabatan" class="form-label">Jabatan</label>
+              <input type="text" class="form-control" id="jabatan">
+            </div>
+          </div>
+        </div>
+
+        <!-- Catatan & Saran -->
+        <div class="form-section">
+          <h6 class="section-title">Catatan & Saran</h6>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="saran" class="form-label">Saran dari Iduka</label>
+              <textarea class="form-control" id="saran" rows="3"></textarea>
+            </div>
+            <div class="col-md-6">
+              <label for="catatan" class="form-label">Catatan Monitoring</label>
+              <textarea class="form-control" id="catatan" rows="3"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Siswa 1 -->
+        <div class="form-section ais-row">
+          <h6 class="section-title">Siswa 1</h6>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="nama1" class="form-label">Nama</label>
+              <input type="text" class="form-control" id="nama1">
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">AIS (Attitude, Innovation, Skill)</label>
+              <div class="row g-2">
+                <div class="col-4">
+                  <input type="text" class="form-control" id="a1" placeholder="Attitude">
+                </div>
+                <div class="col-4">
+                  <input type="text" class="form-control" id="i1" placeholder="Innovation">
+                </div>
+                <div class="col-4">
+                  <input type="text" class="form-control" id="s1" placeholder="Skill">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Siswa 2 -->
+        <div class="form-section ais-row">
+          <h6 class="section-title">Siswa 2</h6>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="nama2" class="form-label">Nama</label>
+              <input type="text" class="form-control" id="nama2">
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">AIS (Attitude, Innovation, Skill)</label>
+              <div class="row g-2">
+                <div class="col-4">
+                  <input type="text" class="form-control" id="a2" placeholder="Attitude">
+                </div>
+                <div class="col-4">
+                  <input type="text" class="form-control" id="i2" placeholder="Innovation">
+                </div>
+                <div class="col-4">
+                  <input type="text" class="form-control" id="s2" placeholder="Skill">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Siswa 3 -->
+        <div class="form-section ais-row">
+          <h6 class="section-title">Siswa 3</h6>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="nama3" class="form-label">Nama</label>
+              <input type="text" class="form-control" id="nama3">
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">AIS (Attitude, Innovation, Skill)</label>
+              <div class="row g-2">
+                <div class="col-4">
+                  <input type="text" class="form-control" id="a3" placeholder="Attitude">
+                </div>
+                <div class="col-4">
+                  <input type="text" class="form-control" id="i3" placeholder="Innovation">
+                </div>
+                <div class="col-4">
+                  <input type="text" class="form-control" id="s3" placeholder="Skill">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Siswa 4 -->
+        <div class="form-section ais-row">
+          <h6 class="section-title">Siswa 4</h6>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="nama4" class="form-label">Nama</label>
+              <input type="text" class="form-control" id="nama4">
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">AIS (Attitude, Innovation, Skill)</label>
+              <div class="row g-2">
+                <div class="col-4">
+                  <input type="text" class="form-control" id="a4" placeholder="Attitude">
+                </div>
+                <div class="col-4">
+                  <input type="text" class="form-control" id="i4" placeholder="Innovation">
+                </div>
+                <div class="col-4">
+                  <input type="text" class="form-control" id="s4" placeholder="Skill">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Link Foto -->
+        <div class="form-section">
+          <h6 class="section-title">Dokumentasi</h6>
+          <div class="mb-3">
+            <label for="link_foto" class="form-label">Link Foto Dokumentasi</label>
+            <input type="url" class="form-control" id="link_foto" 
+                   placeholder="https://drive.google.com/... atau link lainnya">
+            <div class="form-text">Masukkan link Google Drive, Foto, atau dokumentasi lainnya</div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center mt-4">
+          <button type="submit" class="btn btn-submit text-white">
+            <i class="bi bi-send-check me-2"></i>
+            <span id="submitText">Kirim Data Monitoring</span>
+            <span id="loadingSpinner" class="spinner-border spinner-border-sm ms-2 d-none"></span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
 
 <script>
-//document.getElementById("user").innerText = localStorage.getItem("login_user");
-document.getElementById("namaGuru").innerText = localStorage.getItem("login_name");
+// Set nama guru
+document.getElementById("namaGuru").innerText = localStorage.getItem("login_name") || "Guru";
 
-  const MAX_SESSION = 30 * 60 * 1000; // 30 menit
-
+// Session management
+const MAX_SESSION = 30 * 60 * 1000; // 30 menit
 const loginTime = localStorage.getItem("login_time");
 
 if (!localStorage.getItem("login_user") || !loginTime) {
   location.href = "index.html";
 }
 
-// cek waktu session
 if (Date.now() - loginTime > MAX_SESSION) {
   logout();
 }
 
-// reset timer saat ada aktivitas
+// Reset session timer
 ["click","mousemove","keydown"].forEach(evt => {
   document.addEventListener(evt, () => {
     localStorage.setItem("login_time", Date.now());
   });
+});
+
+// Session timer display
+function updateSessionTimer() {
+  const elapsed = Date.now() - loginTime;
+  const remaining = Math.max(0, MAX_SESSION - elapsed);
+  const minutes = Math.floor(remaining / 60000);
+  const seconds = Math.floor((remaining % 60000) / 1000);
+  
+  document.getElementById("sessionTimer").textContent = 
+    `Sesi: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  
+  if (remaining <= 0) logout();
+}
+setInterval(updateSessionTimer, 1000);
+
+// Isi opsi tanggal
+function populateDays() {
+  const daySelect = document.getElementById('tanggal');
+  daySelect.innerHTML = '<option value="">Pilih Tanggal</option>';
+  for (let i = 1; i <= 31; i++) {
+    const day = i.toString().padStart(2, '0');
+    daySelect.innerHTML += `<option value="${day}">${i}</option>`;
+  }
+}
+populateDays();
+
+// Entry IDs Google Form
+const ENTRY_IDS = {
+  // Data Umum
+  "nama": "entry.395377965",
+  "kunjungan_ke": "entry.809276976",
+  "kompetensi": "entry.1585295843",
+  
+  // Data Perusahaan
+  "nama_perusahaan": "entry.1732601792",
+  "alamat_perusahaan": "entry.1545314874",
+  "nomor_hp": "entry.1510064193",
+  "penerima": "entry.1078126114",
+  "jabatan": "entry.1397660782",
+  
+  // Catatan & Saran
+  "saran": "entry.1437596789",
+  "catatan": "entry.893471383",
+  
+  // Siswa 1
+  "nama1": "entry.178210792",
+  "a1": "entry.991811394",
+  "i1": "entry.1581379967",
+  "s1": "entry.1999945650",
+  
+  // Siswa 2
+  "nama2": "entry.1726901817",
+  "a2": "entry.683915107",
+  "i2": "entry.1665157699",
+  "s2": "entry.1274614418",
+  
+  // Siswa 3
+  "nama3": "entry.1280243797",
+  "a3": "entry.1430881922",
+  "i3": "entry.1404995246",
+  "s3": "entry.502077503",
+  
+  // Siswa 4
+  "nama4": "entry.1014051545",
+  "a4": "entry.988655632",
+  "i4": "entry.975431195",
+  "s4": "entry.1429673478",
+  
+  // Dokumentasi
+  "link_foto": "entry.99241609",
+  
+  // Tanggal
+  "tahun": "entry.2090096464_year",
+  "bulan": "entry.2090096464_month",
+  "tanggal": "entry.2090096464_day"
+};
+
+// Google Form ID (dari link https://forms.gle/tGB9di57V4F1B7DY6)
+// ID adalah bagian setelah /d/e/ di URL panjang
+const GOOGLE_FORM_ID = '1FAIpQLScKdBrwC3Q7DQfmn2q_2F_8H-0xB0hLZjSR5EwpYgAi_HdpbQ';
+const FORM_ACTION_URL = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_ID}/formResponse`;
+
+// Handle form submission
+document.getElementById('monitoringForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  // Tampilkan loading
+  document.getElementById('submitText').classList.add('d-none');
+  document.getElementById('loadingSpinner').classList.remove('d-none');
+  
+  // Sembunyikan alert sebelumnya
+  document.getElementById('successAlert').classList.add('d-none');
+  document.getElementById('errorAlert').classList.add('d-none');
+  
+  try {
+    // Kumpulkan data
+    const formData = {};
+    Object.keys(ENTRY_IDS).forEach(key => {
+      const element = document.getElementById(key);
+      if (element) {
+        formData[key] = element.value || '';
+      }
+    });
+    
+    // Validasi required fields
+    if (!formData.nama || !formData.kompetensi || !formData.nama_perusahaan || !formData.alamat_perusahaan) {
+      throw new Error('Harap isi field yang wajib diisi: Nama, Kompetensi, Nama Perusahaan, Alamat Perusahaan');
+    }
+    
+    // Buat URL parameters
+    const params = new URLSearchParams();
+    
+    // Tambahkan semua data ke parameter
+    Object.entries(ENTRY_IDS).forEach(([fieldName, entryId]) => {
+      if (formData[fieldName]) {
+        params.append(entryId, formData[fieldName]);
+      }
+    });
+    
+    // Kirim ke Google Forms
+    const response = await fetch(FORM_ACTION_URL, {
+      method: 'POST',
+      mode: 'no-cors', // Penting untuk Google Forms
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: params.toString()
+    });
+    
+    // Tampilkan sukses
+    document.getElementById('successAlert').classList.remove('d-none');
+    
+    // Reset form (opsional)
+    document.getElementById('monitoringForm').reset();
+    populateDays(); // Reset tanggal
+    
+    // Scroll ke atas
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+  } catch (error) {
+    // Tampilkan error
+    document.getElementById('errorMessage').textContent = error.message;
+    document.getElementById('errorAlert').classList.remove('d-none');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } finally {
+    // Sembunyikan loading
+    document.getElementById('submitText').classList.remove('d-none');
+    document.getElementById('loadingSpinner').classList.add('d-none');
+  }
 });
 
 function logout() {
@@ -70,9 +509,6 @@ function logout() {
   localStorage.removeItem("login_time");
   location.href = "index.html";
 }
-
-
-</script> 
-
+</script>
 </body>
 </html>
