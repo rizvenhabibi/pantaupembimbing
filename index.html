@@ -67,7 +67,9 @@ async function login() {
       if (user === u) {
         if (bcrypt.compareSync(p, hash.trim())) {
           localStorage.setItem("login_user", u);
+          localStorage.setItem("login_time", Date.now());
           location.href = "dashboard.html";
+
           return;
         }
       }
