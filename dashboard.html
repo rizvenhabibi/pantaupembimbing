@@ -24,7 +24,7 @@ if (!localStorage.getItem("login_user")) {
 
 <div class="container mt-4">
   <div class="alert alert-success">
-    Selamat datang, <b id="user"></b>
+    Selamat datang, <span id="namaGuru"></span>
   </div>
 
   <div class="card">
@@ -42,7 +42,7 @@ if (!localStorage.getItem("login_user")) {
 
 <script>
 document.getElementById("user").innerText = localStorage.getItem("login_user");
-
+document.getElementById("namaGuru").innerText = localStorage.getItem("login_name");
 const MAX_SESSION = 30 * 60 * 1000; // 30 menit
 
 const loginTime = localStorage.getItem("login_time");
