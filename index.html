@@ -56,29 +56,39 @@ async function login() {
     return;
   }
 
-  try {
-    const res = await fetch(CSV_URL);
-    const text = await res.text();
-    const rows = text.split("\n").slice(1);
+ try {
+  const res = await fetch(CSV_URL);
+  if (!res.ok) throw new Error("HTTP error");
 
-    for (let row of rows) {
-      const [user, hash] = row.split(",");
+  const text = await res.text();
 
-      if (user === u) {
-        if (bcrypt.compareSync(p, hash.trim())) {
-          localStorage.setItem("login_user", u);
-          localStorage.setItem("login_time", Date.now());
-          location.href = "dashboard.html";
+  const lines = text
+    .trim()
+    .split(/\r?\n/)
+    .slice(1); // buang header
 
-          return;
-        }
-      }
+  for (let line of lines) {
+    if (!line) continue;
+
+    const cols = line.split(",");
+    const user = cols[0]?.trim();
+    const hash = cols.slice(1).join(",").trim(); 
+    // ↑ PENTING: join kembali (bcrypt bisa ada koma)
+
+    if (user === u && bcrypt.compareSync(p, hash)) {
+      localStorage.setItem("login_user", u);
+      localStorage.setItem("login_time", Date.now());
+      location.href = "dashboard.html";
+      return;
     }
-
-    msg.innerText = "Login gagal";
-  } catch (e) {
-    msg.innerText = "Gagal koneksi ke data";
   }
+
+  msg.innerText = "Login gagal";
+} catch (e) {
+  console.error(e);
+  msg.innerText = "Gagal koneksi ke data";
+}
+
 }
 </script>
 
