@@ -43,11 +43,34 @@ if (!localStorage.getItem("login_user")) {
 <script>
 document.getElementById("user").innerText = localStorage.getItem("login_user");
 
-function logout() {
-  localStorage.removeItem("login_user");
+const MAX_SESSION = 30 * 60 * 1000; // 30 menit
+
+const loginTime = localStorage.getItem("login_time");
+
+if (!localStorage.getItem("login_user") || !loginTime) {
   location.href = "index.html";
 }
-</script>
+
+// cek waktu session
+if (Date.now() - loginTime > MAX_SESSION) {
+  logout();
+}
+
+// reset timer saat ada aktivitas
+["click","mousemove","keydown"].forEach(evt => {
+  document.addEventListener(evt, () => {
+    localStorage.setItem("login_time", Date.now());
+  });
+});
+
+function logout() {
+  localStorage.removeItem("login_user");
+  localStorage.removeItem("login_time");
+  location.href = "index.html";
+}
+
+
+</script> 
 
 </body>
 </html>
