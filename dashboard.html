@@ -41,9 +41,10 @@ if (!localStorage.getItem("login_user")) {
 </div>
 
 <script>
-document.getElementById("user").innerText = localStorage.getItem("login_user");
+//document.getElementById("user").innerText = localStorage.getItem("login_user");
 document.getElementById("namaGuru").innerText = localStorage.getItem("login_name");
-const MAX_SESSION = 30 * 60 * 1000; // 30 menit
+
+  const MAX_SESSION = 30 * 60 * 1000; // 30 menit
 
 const loginTime = localStorage.getItem("login_time");
 
