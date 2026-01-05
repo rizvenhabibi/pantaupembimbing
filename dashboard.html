@@ -65,6 +65,7 @@ if (Date.now() - loginTime > MAX_SESSION) {
 
 function logout() {
   localStorage.removeItem("login_user");
+  localStorage.removeItem("login_name");
   localStorage.removeItem("login_time");
   location.href = "index.html";
 }
