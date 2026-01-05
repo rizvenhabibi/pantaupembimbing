@@ -75,9 +75,10 @@ async function login() {
       const cols = line.split(",");
       const user = cols[0]?.trim();
       const hash = cols.slice(1).join(",").trim();
-
+      const nama = cols[2]?.trim();
       if (user === u && bcrypt.compareSync(p, hash)) {
         localStorage.setItem("login_user", u);
+        localStorage.setItem("login_name", nama);
         localStorage.setItem("login_time", Date.now());
         location.href = "dashboard.html";
         return;
