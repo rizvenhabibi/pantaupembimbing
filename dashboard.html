@@ -2,28 +2,270 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  
   <title>Dashboard Guru - Monitoring Prakerin</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
   <style>
-    .card-custom { border: none; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 20px; }
-    .section-title { border-left: 4px solid #0d6efd; padding-left: 12px; margin: 20px 0 15px 0; color: #333; font-weight: 600; }
-    .form-section { background: #f8f9fa; border-radius: 8px; padding: 20px; margin-bottom: 20px; border: 1px solid #dee2e6; }
-    .btn-submit { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; padding: 12px 40px; font-weight: 600; font-size: 1.1rem; }
-    .btn-submit:hover { box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
-    .ais-row { background: #e9ecef; border-radius: 6px; padding: 15px; margin-bottom: 15px; }
-    .form-label { font-weight: 500; color: #495057; }
-    .btn-camera { border: 2px solid #0d6efd; color: #0d6efd; font-weight: 500; padding: 10px; transition: all 0.3s; }
-    .btn-camera:hover { background: #0d6efd; color: white; }
-    .btn-upload { border: 2px solid #6c757d; color: #6c757d; font-weight: 500; padding: 10px; transition: all 0.3s; }
-    .btn-upload:hover { background: #6c757d; color: white; }
-    .progress { height: 25px; border-radius: 5px; }
-    .debug-info { font-size: 0.8rem; font-family: monospace; background: #f8f9fa; padding: 5px; border-radius: 3px; }
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --primary-color: #0d6efd;
+      --success-color: #198754;
+      --danger-color: #dc3545;
+      --warning-color: #ffc107;
+    }
+
+    .card-custom { 
+      border: none; 
+      border-radius: 12px; 
+      box-shadow: 0 6px 15px rgba(0,0,0,0.08); 
+      margin-bottom: 25px; 
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card-custom:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+    }
+
+    .section-title { 
+      border-left: 4px solid var(--primary-color); 
+      padding-left: 15px; 
+      margin: 25px 0 20px 0; 
+      color: #2c3e50; 
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .form-section { 
+      background: #f8f9fa; 
+      border-radius: 10px; 
+      padding: 25px; 
+      margin-bottom: 25px; 
+      border: 1px solid #e9ecef;
+      transition: background 0.3s ease;
+    }
+    .form-section:hover {
+      background: #f1f3f4;
+    }
+
+    .btn-submit { 
+      background: var(--primary-gradient); 
+      border: none; 
+      padding: 14px 45px; 
+      font-weight: 600; 
+      font-size: 1.15rem; 
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+    }
+    .btn-submit:hover { 
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+      transform: translateY(-2px);
+    }
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    .ais-row { 
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 8px; 
+      padding: 18px; 
+      margin-bottom: 18px;
+      border-left: 4px solid var(--primary-color);
+    }
+
+    .form-label { 
+      font-weight: 500; 
+      color: #495057; 
+      margin-bottom: 8px;
+    }
+
+    .btn-camera { 
+      border: 2px solid var(--primary-color); 
+      background: white;
+      color: var(--primary-color); 
+      font-weight: 500; 
+      padding: 12px; 
+      border-radius: 8px;
+      transition: all 0.3s;
+      width: 100%;
+    }
+    .btn-camera:hover { 
+      background: var(--primary-color); 
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .btn-upload { 
+      border: 2px solid #6c757d; 
+      background: white;
+      color: #6c757d; 
+      font-weight: 500; 
+      padding: 12px; 
+      border-radius: 8px;
+      transition: all 0.3s;
+      width: 100%;
+    }
+    .btn-upload:hover { 
+      background: #6c757d; 
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .progress { 
+      height: 28px; 
+      border-radius: 8px; 
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .progress-bar {
+      transition: width 0.5s ease;
+      font-weight: 500;
+    }
+
+    .debug-info { 
+      font-size: 0.85rem; 
+      font-family: 'Courier New', monospace; 
+      background: #f1f5f9; 
+      padding: 10px; 
+      border-radius: 6px;
+      border-left: 3px solid #94a3b8;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .alert-dismissible {
+      border-radius: 8px;
+      border: none;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .navbar {
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .form-control, .form-select {
+      border-radius: 6px;
+      border: 1px solid #ced4da;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      padding: 10px 15px;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    }
+
+    .image-preview-container {
+      border: 2px dashed #dee2e6;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      background: #fafafa;
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      transition: border-color 0.3s;
+    }
+    .image-preview-container:hover {
+      border-color: var(--primary-color);
+    }
+    .image-preview-container img {
+      max-height: 180px;
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .status-indicator.success {
+      background: rgba(25, 135, 84, 0.1);
+      color: var(--success-color);
+    }
+    .status-indicator.error {
+      background: rgba(220, 53, 69, 0.1);
+      color: var(--danger-color);
+    }
+    .status-indicator.warning {
+      background: rgba(255, 193, 7, 0.1);
+      color: #856404;
+    }
+
+    .floating-notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Compression Feedback Styles */
+    .compression-feedback {
+      transition: all 0.3s ease;
+      border-left: 4px solid #0dcaf0 !important;
+      margin-bottom: 15px;
+    }
+    .compression-feedback.processing {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 100%) !important;
+      border-left-color: #ffc107 !important;
+    }
+    .compression-feedback.success {
+      background: linear-gradient(135deg, #f8f9fa 0%, #d1e7dd 100%) !important;
+      border-left-color: #198754 !important;
+    }
+    .compression-feedback.error {
+      background: linear-gradient(135deg, #f8f9fa 0%, #f8d7da 100%) !important;
+      border-left-color: #dc3545 !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .btn-camera, .btn-upload {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+      .form-section {
+        padding: 15px;
+      }
+    }
+
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      .form-section {
+        background: #2d3748;
+        border-color: #4a5568;
+      }
+      .ais-row {
+        background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+      }
+      .debug-info {
+        background: #1a202c;
+        color: #e2e8f0;
+      }
+    }
+	
+</style>
   </style>
 </head>
 <body>
 
 <script>
+// Redirect ke login jika belum login
 if (!localStorage.getItem("login_user")) {
   location.href = "index.html";
 }
@@ -31,519 +273,1007 @@ if (!localStorage.getItem("login_user")) {
 
 <nav class="navbar navbar-dark bg-dark">
   <div class="container-fluid">
-    <span class="navbar-brand">Dashboard Monitoring Prakerin</span>
-    <button class="btn btn-sm btn-outline-light" onclick="logout()">
-      <i class="bi bi-box-arrow-right me-1"></i>Logout
-    </button>
+    <span class="navbar-brand d-flex align-items-center">
+      <i class="bi bi-graph-up me-2"></i>
+      <span>Dashboard Monitoring Prakerin</span>
+    </span>
+    <div class="d-flex align-items-center">
+      <span class="text-light me-3 d-none d-md-block">
+        <i class="bi bi-person-circle me-1"></i>
+        <span id="namaGuru"></span>
+      </span>
+      <button class="btn btn-sm btn-outline-light" onclick="logout()">
+        <i class="bi bi-box-arrow-right me-1"></i>Logout
+      </button>
+    </div>
   </div>
 </nav>
 
 <div class="container mt-4">
-  <div class="alert alert-primary d-flex justify-content-between align-items-center">
-    <div>
-      <h5 class="mb-1">Selamat datang, <span id="namaGuru"></span></h5>
-      <small class="text-muted">Form Monitoring Kunjungan Prakerin</small>
+  <!-- Session Alert -->
+  <div class="alert alert-primary d-flex justify-content-between align-items-center shadow-sm">
+    <div class="d-flex align-items-center">
+      <div class="bg-white rounded-circle p-2 me-3">
+        <i class="bi bi-person-check text-primary fs-5"></i>
+      </div>
+      <div>
+        <h5 class="mb-1">Selamat datang, <span id="namaGuruDisplay"></span></h5>
+        <small class="text-muted">
+          <i class="bi bi-calendar-check me-1"></i>
+          Form Monitoring Kunjungan Prakerin
+        </small>
+      </div>
     </div>
     <div class="text-end">
-      <small id="sessionTimer" class="text-muted">Sesi: 30:00</small>
+      <div class="d-flex align-items-center">
+        <i class="bi bi-clock-history text-muted me-2"></i>
+        <div>
+          <small class="text-muted d-block">Sesi aktif</small>
+          <strong id="sessionTimer" class="text-dark">30:00</strong>
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- Main Card -->
   <div class="card card-custom">
-    <div class="card-header bg-primary text-white py-3">
-      <h5 class="card-title mb-0">
-        <i class="bi bi-clipboard-check me-2"></i>Form Monitoring Siswa Prakerin
-      </h5>
+    <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
+      <div>
+        <h5 class="card-title mb-0">
+          <i class="bi bi-clipboard-check me-2"></i>Form Monitoring Siswa Prakerin
+        </h5>
+        <small class="opacity-75">Lengkapi semua data monitoring kunjungan</small>
+      </div>
+      <button type="button" class="btn btn-sm btn-outline-light" onclick="toggleDebugMode()">
+        <i class="bi bi-bug"></i>
+      </button>
     </div>
+    
     <div class="card-body">
+      <!-- Notifications Area -->
+      <div id="notificationArea"></div>
+      
+      <!-- Success Alert -->
       <div id="successAlert" class="alert alert-success alert-dismissible fade show d-none" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i>
-        <strong>Berhasil!</strong> Data monitoring telah dikirim ke Google Form.
+        <div class="d-flex align-items-center">
+          <div class="flex-shrink-0">
+            <i class="bi bi-check-circle-fill fs-4"></i>
+          </div>
+          <div class="flex-grow-1 ms-3">
+            <h6 class="alert-heading mb-1">Berhasil!</h6>
+            <p class="mb-0">Data monitoring telah dikirim ke Google Form dan tersimpan di sistem.</p>
+          </div>
+        </div>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
       </div>
       
+      <!-- Error Alert -->
       <div id="errorAlert" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        <strong>Error!</strong> <span id="errorMessage">Terjadi kesalahan.</span>
+        <div class="d-flex align-items-center">
+          <div class="flex-shrink-0">
+            <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+          </div>
+          <div class="flex-grow-1 ms-3">
+            <h6 class="alert-heading mb-1">Terjadi Kesalahan!</h6>
+            <p class="mb-0" id="errorMessage">Gagal mengirim data. Silakan coba lagi.</p>
+          </div>
+        </div>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
       </div>
 
-      <!-- Debug Info -->
-      <div id="debugInfo" class="alert alert-info d-none">
-        <small class="debug-info" id="debugText"></small>
+      <!-- Debug Panel -->
+      <div id="debugPanel" class="mb-4 d-none">
+        <div class="card border-warning">
+          <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center py-2">
+            <small class="fw-bold"><i class="bi bi-terminal me-1"></i>Debug Mode</small>
+            <button class="btn btn-sm btn-outline-dark btn-sm" onclick="clearDebugLog()">
+              <i class="bi bi-trash"></i> Clear
+            </button>
+          </div>
+          <div class="card-body p-0">
+            <pre class="debug-info m-0 p-3" id="debugText"></pre>
+          </div>
+        </div>
       </div>
 
-      <form id="monitoringForm">
+      <!-- Main Form -->
+      <form id="monitoringForm" novalidate>
         <!-- Tanggal Kunjungan -->
         <div class="form-section">
-          <h6 class="section-title">Tanggal Kunjungan</h6>
+          <h6 class="section-title">
+            <i class="bi bi-calendar-date me-2"></i>Tanggal Kunjungan
+          </h6>
           <div class="row g-3">
             <div class="col-md-4">
               <label for="tahun" class="form-label">Tahun</label>
-              <select class="form-select" id="tahun">
+              <select class="form-select" id="tahun" required>
                 <option value="">Pilih Tahun</option>
-                <option value="2024">2024</option>
-                <option value="2025" selected>2025</option>
-                <option value="2026">2026</option>
               </select>
+              <div class="invalid-feedback">Harap pilih tahun</div>
             </div>
             <div class="col-md-4">
               <label for="bulan" class="form-label">Bulan</label>
-              <select class="form-select" id="bulan">
+              <select class="form-select" id="bulan" required>
                 <option value="">Pilih Bulan</option>
-                <option value="01">Januari</option>
-                <option value="02">Februari</option>
-                <option value="03">Maret</option>
-                <option value="04">April</option>
-                <option value="05">Mei</option>
-                <option value="06">Juni</option>
-                <option value="07">Juli</option>
-                <option value="08">Agustus</option>
-                <option value="09">September</option>
-                <option value="10">Oktober</option>
-                <option value="11">November</option>
-                <option value="12">Desember</option>
               </select>
+              <div class="invalid-feedback">Harap pilih bulan</div>
             </div>
             <div class="col-md-4">
               <label for="tanggal" class="form-label">Tanggal</label>
-              <select class="form-select" id="tanggal">
+              <select class="form-select" id="tanggal" required>
                 <option value="">Pilih Tanggal</option>
               </select>
+              <div class="invalid-feedback">Harap pilih tanggal</div>
             </div>
           </div>
         </div>
 
         <!-- Data Umum -->
         <div class="form-section">
-          <h6 class="section-title">Data Umum</h6>
+          <h6 class="section-title">
+            <i class="bi bi-person-badge me-2"></i>Data Umum
+          </h6>
           <div class="row g-3">
             <div class="col-md-6">
-              <label for="nama" class="form-label">Nama</label>
-              <input type="text" class="form-control" id="nama" required>
+              <label for="nama" class="form-label">Nama Guru Pembimbing</label>
+              <input type="text" class="form-control" id="nama" required
+                     placeholder="Masukkan nama lengkap">
+              <div class="invalid-feedback">Harap isi nama guru pembimbing</div>
             </div>
             <div class="col-md-6">
               <label for="kunjungan_ke" class="form-label">Kunjungan Ke</label>
-              <input type="text" class="form-control" id="kunjungan_ke" placeholder="Contoh: Kunjungan 1, Kunjungan 2">
+              <input type="text" class="form-control" id="kunjungan_ke" 
+                     placeholder="Contoh: Kunjungan 1, Kunjungan 2, dll.">
             </div>
-            <div class="col-md-12">
-              <label for="kompetensi" class="form-label">Kompetensi</label>
-              <input type="text" class="form-control" id="kompetensi" required>
+            <div class="col-12">
+              <label for="kompetensi" class="form-label">Kompetensi Keahlian</label>
+              <input type="text" class="form-control" id="kompetensi" required
+                     placeholder="Masukkan kompetensi keahlian siswa">
+              <div class="invalid-feedback">Harap isi kompetensi keahlian</div>
             </div>
           </div>
         </div>
 
         <!-- Data Perusahaan -->
         <div class="form-section">
-          <h6 class="section-title">Data Perusahaan/Iduka</h6>
+          <h6 class="section-title">
+            <i class="bi bi-building me-2"></i>Data Perusahaan/Iduka
+          </h6>
           <div class="row g-3">
             <div class="col-md-6">
               <label for="nama_perusahaan" class="form-label">Nama Perusahaan</label>
-              <input type="text" class="form-control" id="nama_perusahaan" required>
+              <input type="text" class="form-control" id="nama_perusahaan" required
+                     placeholder="Nama perusahaan/industri">
+              <div class="invalid-feedback">Harap isi nama perusahaan</div>
             </div>
             <div class="col-md-6">
               <label for="alamat_perusahaan" class="form-label">Alamat Perusahaan</label>
-              <input type="text" class="form-control" id="alamat_perusahaan" required>
+              <input type="text" class="form-control" id="alamat_perusahaan" required
+                     placeholder="Alamat lengkap perusahaan">
+              <div class="invalid-feedback">Harap isi alamat perusahaan</div>
             </div>
             <div class="col-md-6">
-              <label for="nomor_hp" class="form-label">Nomor HP Perusahaan</label>
-              <input type="tel" class="form-control" id="nomor_hp">
+              <label for="nomor_hp" class="form-label">Nomor HP/Telepon</label>
+              <input type="tel" class="form-control" id="nomor_hp"
+                     placeholder="Contoh: 081234567890">
             </div>
             <div class="col-md-6">
               <label for="penerima" class="form-label">Nama yang Menerima</label>
-              <input type="text" class="form-control" id="penerima">
+              <input type="text" class="form-control" id="penerima"
+                     placeholder="Nama penerima kunjungan">
             </div>
             <div class="col-md-6">
-              <label for="jabatan" class="form-label">Jabatan</label>
-              <input type="text" class="form-control" id="jabatan">
+              <label for="jabatan" class="form-label">Jabatan Penerima</label>
+              <input type="text" class="form-control" id="jabatan"
+                     placeholder="Jabatan penerima kunjungan">
             </div>
           </div>
         </div>
 
         <!-- Catatan & Saran -->
         <div class="form-section">
-          <h6 class="section-title">Catatan & Saran</h6>
+          <h6 class="section-title">
+            <i class="bi bi-chat-left-text me-2"></i>Catatan & Saran
+          </h6>
           <div class="row g-3">
             <div class="col-md-6">
               <label for="saran" class="form-label">Saran dari Iduka</label>
-              <textarea class="form-control" id="saran" rows="3"></textarea>
+              <textarea class="form-control" id="saran" rows="4"
+                        placeholder="Saran atau masukan dari pihak perusahaan..."></textarea>
             </div>
             <div class="col-md-6">
               <label for="catatan" class="form-label">Catatan Monitoring</label>
-              <textarea class="form-control" id="catatan" rows="3"></textarea>
+              <textarea class="form-control" id="catatan" rows="4"
+                        placeholder="Catatan penting selama monitoring..."></textarea>
             </div>
           </div>
         </div>
 
-        <!-- Data Siswa 1-4 (sama seperti sebelumnya) -->
-        <div class="form-section ais-row">
-          <h6 class="section-title">Siswa 1</h6>
-          <div class="row g-3">
-            <div class="col-md-4"><label for="nama1" class="form-label">Nama</label><input type="text" class="form-control" id="nama1"></div>
-            <div class="col-md-8">
-              <label class="form-label">AIS</label>
-              <div class="row g-2">
-                <div class="col-4"><input type="text" class="form-control" id="a1" placeholder="Alpha"></div>
-                <div class="col-4"><input type="text" class="form-control" id="i1" placeholder="Izin"></div>
-                <div class="col-4"><input type="text" class="form-control" id="s1" placeholder="Sakit"></div>
+        <!-- Data Siswa 1-4 -->
+        <div class="row">
+          <div class="col-12">
+            <h6 class="section-title mb-4">
+              <i class="bi bi-people me-2"></i>Data Siswa Prakerin
+              <small class="text-muted ms-2">(Maksimal 4 siswa)</small>
+            </h6>
+          </div>
+          
+          <!-- Siswa 1 -->
+          <div class="col-lg-6 mb-3">
+            <div class="ais-row h-100">
+              <h6 class="fw-bold text-primary mb-3">
+                <i class="bi bi-person-circle me-2"></i>Siswa 1
+              </h6>
+              <div class="row g-3">
+                <div class="col-12">
+                  <label for="nama1" class="form-label">Nama Siswa</label>
+                  <input type="text" class="form-control" id="nama1" 
+                         placeholder="Nama lengkap siswa">
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Kehadiran (AIS)</label>
+                  <div class="row g-2">
+                    <div class="col-4">
+                      <input type="number" min="0" class="form-control" id="a1" 
+                             placeholder="Alpha" title="Jumlah hari Alpha">
+                    </div>
+                    <div class="col-4">
+                      <input type="number" min="0" class="form-control" id="i1" 
+                             placeholder="Izin" title="Jumlah hari Izin">
+                    </div>
+                    <div class="col-4">
+                      <input type="number" min="0" class="form-control" id="s1" 
+                             placeholder="Sakit" title="Jumlah hari Sakit">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Siswa 2 -->
+          <div class="col-lg-6 mb-3">
+            <div class="ais-row h-100">
+              <h6 class="fw-bold text-primary mb-3">
+                <i class="bi bi-person-circle me-2"></i>Siswa 2
+              </h6>
+              <div class="row g-3">
+                <div class="col-12">
+                  <label for="nama2" class="form-label">Nama Siswa</label>
+                  <input type="text" class="form-control" id="nama2" 
+                         placeholder="Nama lengkap siswa">
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Kehadiran (AIS)</label>
+                  <div class="row g-2">
+                    <div class="col-4">
+                      <input type="number" min="0" class="form-control" id="a2" 
+                             placeholder="Alpha" title="Jumlah hari Alpha">
+                    </div>
+                    <div class="col-4">
+                      <input type="number" min="0" class="form-control" id="i2" 
+                             placeholder="Izin" title="Jumlah hari Izin">
+                    </div>
+                    <div class="col-4">
+                      <input type="number" min="0" class="form-control" id="s2" 
+                             placeholder="Sakit" title="Jumlah hari Sakit">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Siswa 3 -->
+          <div class="col-lg-6 mb-3">
+            <div class="ais-row h-100">
+              <h6 class="fw-bold text-primary mb-3">
+                <i class="bi bi-person-circle me-2"></i>Siswa 3
+              </h6>
+              <div class="row g-3">
+                <div class="col-12">
+                  <label for="nama3" class="form-label">Nama Siswa</label>
+                  <input type="text" class="form-control" id="nama3" 
+                         placeholder="Nama lengkap siswa">
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Kehadiran (AIS)</label>
+                  <div class="row g-2">
+                    <div class="col-4">
+                      <input type="number" min="0" class="form-control" id="a3" 
+                             placeholder="Alpha" title="Jumlah hari Alpha">
+                    </div>
+                    <div class="col-4">
+                      <input type="number" min="0" class="form-control" id="i3" 
+                             placeholder="Izin" title="Jumlah hari Izin">
+                    </div>
+                    <div class="col-4">
+                      <input type="number" min="0" class="form-control" id="s3" 
+                             placeholder="Sakit" title="Jumlah hari Sakit">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Siswa 4 -->
+          <div class="col-lg-6 mb-3">
+            <div class="ais-row h-100">
+              <h6 class="fw-bold text-primary mb-3">
+                <i class="bi bi-person-circle me-2"></i>Siswa 4
+              </h6>
+              <div class="row g-3">
+                <div class="col-12">
+                  <label for="nama4" class="form-label">Nama Siswa</label>
+                  <input type="text" class="form-control" id="nama4" 
+                         placeholder="Nama lengkap siswa">
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Kehadiran (AIS)</label>
+                  <div class="row g-2">
+                    <div class="col-4">
+                      <input type="number" min="0" class="form-control" id="a4" 
+                             placeholder="Alpha" title="Jumlah hari Alpha">
+                    </div>
+                    <div class="col-4">
+                      <input type="number" min="0" class="form-control" id="i4" 
+                             placeholder="Izin" title="Jumlah hari Izin">
+                    </div>
+                    <div class="col-4">
+                      <input type="number" min="0" class="form-control" id="s4" 
+                             placeholder="Sakit" title="Jumlah hari Sakit">
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="form-section ais-row">
-          <h6 class="section-title">Siswa 2</h6>
-          <div class="row g-3">
-            <div class="col-md-4"><label for="nama2" class="form-label">Nama</label><input type="text" class="form-control" id="nama2"></div>
-            <div class="col-md-8">
-              <label class="form-label">AIS</label>
-              <div class="row g-2">
-                <div class="col-4"><input type="text" class="form-control" id="a2" placeholder="Alpha"></div>
-                <div class="col-4"><input type="text" class="form-control" id="i2" placeholder="Izin"></div>
-                <div class="col-4"><input type="text" class="form-control" id="s2" placeholder="Sakit"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-section ais-row">
-          <h6 class="section-title">Siswa 3</h6>
-          <div class="row g-3">
-            <div class="col-md-4"><label for="nama3" class="form-label">Nama</label><input type="text" class="form-control" id="nama3"></div>
-            <div class="col-md-8">
-              <label class="form-label">AIS</label>
-              <div class="row g-2">
-                <div class="col-4"><input type="text" class="form-control" id="a3" placeholder="Alpha"></div>
-                <div class="col-4"><input type="text" class="form-control" id="i3" placeholder="Izin"></div>
-                <div class="col-4"><input type="text" class="form-control" id="s3" placeholder="Sakit"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-section ais-row">
-          <h6 class="section-title">Siswa 4</h6>
-          <div class="row g-3">
-            <div class="col-md-4"><label for="nama4" class="form-label">Nama</label><input type="text" class="form-control" id="nama4"></div>
-            <div class="col-md-8">
-              <label class="form-label">AIS</label>
-              <div class="row g-2">
-                <div class="col-4"><input type="text" class="form-control" id="a4" placeholder="Alpha"></div>
-                <div class="col-4"><input type="text" class="form-control" id="i4" placeholder="Izin"></div>
-                <div class="col-4"><input type="text" class="form-control" id="s4" placeholder="Sakit"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Dokumentasi -->
+        <!-- Dokumentasi dengan Kompresi -->
         <div class="form-section">
-          <h6 class="section-title"><i class="bi bi-camera me-2"></i>Dokumentasi</h6>
-          <div class="mb-3 text-center">
-            <div id="imagePreview" class="border rounded p-3 mb-3" style="display: none;">
-              <img id="previewImage" src="#" alt="Preview" class="img-fluid rounded" style="max-height: 200px;">
-              <div class="mt-2">
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeImage()">
-                  <i class="bi bi-trash"></i> Hapus Foto
-                </button>
+          <h6 class="section-title">
+            <i class="bi bi-camera me-2"></i>Dokumentasi Kunjungan
+          </h6>
+          
+          <div class="image-preview-container" id="imagePreview">
+            <div class="text-center" id="previewPlaceholder">
+              <i class="bi bi-image text-muted fs-1 mb-3 d-block"></i>
+              <p class="text-muted mb-2">Preview gambar akan muncul di sini</p>
+              <small class="text-muted">Upload atau ambil foto untuk melihat preview</small>
+            </div>
+            <img id="previewImage" class="d-none" alt="Preview Gambar">
+          </div>
+          
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="btn btn-camera" for="cameraInput">
+                <i class="bi bi-camera me-2"></i>Ambil Foto dengan Kamera
+              </label>
+              <input type="file" id="cameraInput" accept="image/*" capture="environment" 
+                     class="d-none" onchange="handleImageCapture(event)">
+            </div>
+            <div class="col-md-6">
+              <label class="btn btn-upload" for="fileInput">
+                <i class="bi bi-upload me-2"></i>Upload Gambar dari File
+              </label>
+              <input type="file" id="fileInput" accept="image/*" 
+                     class="d-none" onchange="handleImageCapture(event)">
+            </div>
+          </div>
+          
+          <!-- Compression Feedback -->
+          <div class="compression-feedback p-3 rounded border">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <small class="fw-medium">
+                <i class="bi bi-gear me-1"></i>Pengaturan Kompresi Otomatis
+              </small>
+              <span class="badge bg-info">Target: &lt;500 KB</span>
+            </div>
+            
+            <!-- Real-time compression stats -->
+            <div id="compressionStats" class="d-none">
+              <div class="d-flex justify-content-between small mb-1">
+                <span id="originalSizeText">Asli: -</span>
+                <span id="compressedSizeText" class="fw-bold text-success">Hasil: -</span>
+              </div>
+              <div class="progress" style="height: 6px;">
+                <div id="compressionProgressBar" class="progress-bar progress-bar-striped" 
+                     style="width: 0%" role="progressbar"></div>
+              </div>
+              <div class="d-flex justify-content-between mt-1">
+                <small id="reductionPercent" class="text-muted">-</small>
+                <small id="timeEstimate" class="text-muted">-</small>
               </div>
             </div>
             
-            <div class="row g-2 mb-3">
-              <div class="col-md-6">
-                <label class="btn btn-camera w-100" for="cameraInput">
-                  <i class="bi bi-camera me-2"></i>Ambil Foto dengan Kamera
-                </label>
-                <input type="file" id="cameraInput" accept="image/*" capture="environment" class="d-none" onchange="handleCameraCapture(event)">
-              </div>
-              <div class="col-md-6">
-                <label class="btn btn-upload w-100" for="fileInput">
-                  <i class="bi bi-upload me-2"></i>Upload Gambar dari File
-                </label>
-                <input type="file" id="fileInput" accept="image/*" class="d-none" onchange="handleFileUpload(event)">
-              </div>
+            <!-- Static info -->
+            <div id="compressionInfoStatic" class="small text-muted">
+              <i class="bi bi-info-circle me-1"></i>
+              Gambar akan dikompresi otomatis ke ukuran optimal untuk dokumentasi.
+              <br>
+              <span class="mt-1 d-block">
+                <i class="bi bi-check-circle me-1 text-success"></i>
+                Aman untuk Vercel & GitHub • Cepat di-load • Hemat bandwidth
+              </span>
             </div>
-            
-            <div class="progress mb-3" style="display: none;" id="uploadProgress">
-              <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%">0%</div>
+          </div>
+          
+          <!-- Upload Progress -->
+          <div class="mb-4" id="uploadProgress" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span id="uploadStatusText" class="fw-medium">Mengupload gambar...</span>
+              <span id="uploadPercentage" class="badge bg-primary">0%</span>
             </div>
-            
-            <div class="mb-3">
-              <label for="link_foto" class="form-label">Link Foto Dokumentasi</label>
-              <div class="input-group">
-                <input type="url" class="form-control" id="link_foto" placeholder="Link akan otomatis terisi setelah upload..." readonly>
-                <button class="btn btn-outline-primary" type="button" onclick="copyLink()" title="Salin link">
-                  <i class="bi bi-clipboard"></i>
-                </button>
-                <button class="btn btn-outline-success" type="button" onclick="viewOnGitHub()" title="Lihat di GitHub" id="githubBtn" style="display: none;">
-                  <i class="bi bi-github"></i>
-                </button>
-              </div>
-              <div class="form-text">
-                <span id="uploadStatus">Belum ada gambar</span>
-                <span id="fileSize" class="ms-2 text-muted"></span>
-              </div>
+            <div class="progress">
+              <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                   id="progressBar" role="progressbar" style="width: 0%"></div>
+            </div>
+            <small id="uploadDetails" class="text-muted mt-2 d-block"></small>
+          </div>
+          
+          <!-- Link Display -->
+          <div class="mb-3">
+            <label for="link_foto" class="form-label">Link Foto Dokumentasi</label>
+            <div class="input-group">
+              <input type="url" class="form-control" id="link_foto" 
+                     placeholder="Link akan otomatis terisi setelah upload..." readonly>
+              <button class="btn btn-outline-primary" type="button" onclick="copyLink()" 
+                      title="Salin link ke clipboard">
+                <i class="bi bi-clipboard"></i>
+              </button>
+              <button class="btn btn-outline-success" type="button" onclick="viewOnGitHub()" 
+                      title="Lihat di GitHub" id="githubBtn" style="display: none;">
+                <i class="bi bi-github"></i>
+              </button>
+              <button class="btn btn-outline-danger" type="button" onclick="removeImage()" 
+                      title="Hapus gambar">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+            <div class="form-text d-flex justify-content-between align-items-center mt-2">
+              <span id="uploadStatus" class="status-indicator">
+                <i class="bi bi-info-circle me-1"></i>
+                <span>Belum ada gambar</span>
+              </span>
+              <span id="fileSize" class="text-muted small"></span>
             </div>
           </div>
         </div>
 
-        <div class="text-center mt-4 pt-3 border-top">
-          <button type="submit" class="btn btn-submit text-white">
+        <!-- Action Buttons -->
+        <div class="text-center mt-5 pt-4 border-top">
+          <button type="submit" class="btn btn-submit text-white me-3">
             <i class="bi bi-send-check me-2"></i>
             <span id="submitText">Kirim Data Monitoring</span>
             <span id="loadingSpinner" class="spinner-border spinner-border-sm ms-2 d-none"></span>
           </button>
-          <button type="button" class="btn btn-outline-secondary ms-2" onclick="resetForm()">
+          
+          <button type="button" class="btn btn-outline-secondary me-3" onclick="resetForm()">
             <i class="bi bi-arrow-clockwise me-2"></i>Reset Form
           </button>
-          <button type="button" class="btn btn-outline-info ms-2" onclick="testGitHubConnection()">
-            <i class="bi bi-wrench me-2"></i>Test GitHub
+          
+          <button type="button" class="btn btn-outline-info me-3" onclick="testAPIConnection()">
+            <i class="bi bi-wrench me-2"></i>Test Koneksi
+          </button>
+          
+          <button type="button" class="btn btn-outline-warning" onclick="saveDraft()">
+            <i class="bi bi-save me-2"></i>Simpan Draft
           </button>
         </div>
       </form>
     </div>
+    
+    <div class="card-footer bg-light py-3">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <small class="text-muted">
+            <i class="bi bi-shield-check me-1"></i>
+            Data dikirim secara aman ke Google Forms
+          </small>
+        </div>
+        <div class="col-md-4 text-md-end">
+          <small class="text-muted">
+            <i class="bi bi-clock-history me-1"></i>
+            Terakhir disimpan: <span id="lastSaved">-</span>
+          </small>
+        </div>
+      </div>
+    </div>
   </div>
   
+  <!-- Footer -->
   <div class="text-center text-muted mt-4 mb-5">
     <small>
-      <i class="bi bi-shield-check me-1"></i>Data dikirim ke Google Forms • © 2024 Monitoring Prakerin
+      <i class="bi bi-c-circle me-1"></i>2024 Monitoring Prakerin 
+      <span class="mx-2">•</span>
+      <i class="bi bi-github me-1"></i>GitHub Integration
+      <span class="mx-2">•</span>
+      <i class="bi bi-shield-lock me-1"></i>Data Terenkripsi
     </small>
+  </div>
+</div>
+
+<!-- Floating Notification -->
+<div id="floatingNotification" class="floating-notification d-none">
+  <div class="toast show" role="alert">
+    <div class="toast-body">
+      <div class="d-flex align-items-center">
+        <div class="flex-shrink-0" id="notificationIcon"></div>
+        <div class="flex-grow-1 ms-3">
+          <strong id="notificationTitle"></strong>
+          <p class="mb-0 small" id="notificationMessage"></p>
+        </div>
+        <button type="button" class="btn-close ms-3" onclick="hideNotification()"></button>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- =============================== JAVASCRIPT =============================== -->
 <script>
-// ==================== 1. PROTECT PAGE & SESSION ====================
-if (!localStorage.getItem("login_user")) location.href = "index.html";
-document.getElementById("namaGuru").innerText = localStorage.getItem("login_name") || "Guru";
-
-const MAX_SESSION = 30 * 60 * 1000;
-const loginTime = localStorage.getItem("login_time");
-if (!loginTime || Date.now() - loginTime > MAX_SESSION) logout();
-
-function updateSessionTimer() {
-  const elapsed = Date.now() - (parseInt(loginTime) || Date.now());
-  const remaining = Math.max(0, MAX_SESSION - elapsed);
-  const minutes = Math.floor(remaining / 60000);
-  const seconds = Math.floor((remaining % 60000) / 1000);
-  document.getElementById("sessionTimer").textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  if (remaining <= 0) logout();
-}
-setInterval(updateSessionTimer, 1000);
-
-["click","mousemove","keydown"].forEach(evt => {
-  document.addEventListener(evt, () => localStorage.setItem("login_time", Date.now()));
-});
-
-// ==================== 2. KONFIGURASI GITHUB ====================
-// ⚠️ GANTI TOKEN ANDA DI SINI!
-const GITHUB_CONFIG = {
-  token: 'MASUKKAN_TOKEN_GITHUB_ANDA_DISINI',  // Contoh: ghp_AbCdEfG1234567890
+// ==================== 1. KONFIGURASI ====================
+const CONFIG = {
+  // Konfigurasi GitHub (HANYA untuk display, token tidak disimpan di sini)
   username: 'rizvenhabibi',
   repo: 'pantaupembimbing',
   branch: 'main',
-  folder: 'uploads'
+  folder: 'uploads',
+  
+  // API Endpoint (Vercel Function)
+  apiEndpoint: '/api/upload',
+  
+  // Google Form Configuration
+  googleForm: {
+    id: '1FAIpQLSclDH_24SE9ECq-ti_qyQHSyBMoCsHAkRtdFT5Yrr1e7wIR4A',
+    entryIds: {
+      "nama": "entry.395377965",
+      "kunjungan_ke": "entry.809276976",
+      "kompetensi": "entry.1585295843",
+      "nama_perusahaan": "entry.1732601792",
+      "alamat_perusahaan": "entry.1545314874",
+      "nomor_hp": "entry.1510064193",
+      "penerima": "entry.1078126114",
+      "jabatan": "entry.1397660782",
+      "saran": "entry.1437596789",
+      "catatan": "entry.893471383",
+      "nama1": "entry.178210792",
+      "a1": "entry.991811394",
+      "i1": "entry.1581379967",
+      "s1": "entry.1999945650",
+      "nama2": "entry.1726901817",
+      "a2": "entry.683915107",
+      "i2": "entry.1665157699",
+      "s2": "entry.1274614418",
+      "nama3": "entry.1280243797",
+      "a3": "entry.1430881922",
+      "i3": "entry.1404995246",
+      "s3": "entry.502077503",
+      "nama4": "entry.1014051545",
+      "a4": "entry.988655632",
+      "i4": "entry.975431195",
+      "s4": "entry.1429673478",
+      "link_foto": "entry.99241609",
+      "tahun": "entry.2090096464_year",
+      "bulan": "entry.2090096464_month",
+      "tanggal": "entry.2090096464_day"
+    }
+  },
+  
+  // Session Configuration
+  sessionTimeout: 30 * 60 * 1000, // 30 menit
+  autoSaveInterval: 60000, // 1 menit
 };
 
-// Entry IDs Google Form
-const ENTRY_IDS = {
-  "nama": "entry.395377965", "kunjungan_ke": "entry.809276976", "kompetensi": "entry.1585295843",
-  "nama_perusahaan": "entry.1732601792", "alamat_perusahaan": "entry.1545314874", "nomor_hp": "entry.1510064193",
-  "penerima": "entry.1078126114", "jabatan": "entry.1397660782", "saran": "entry.1437596789", "catatan": "entry.893471383",
-  "nama1": "entry.178210792", "a1": "entry.991811394", "i1": "entry.1581379967", "s1": "entry.1999945650",
-  "nama2": "entry.1726901817", "a2": "entry.683915107", "i2": "entry.1665157699", "s2": "entry.1274614418",
-  "nama3": "entry.1280243797", "a3": "entry.1430881922", "i3": "entry.1404995246", "s3": "entry.502077503",
-  "nama4": "entry.1014051545", "a4": "entry.988655632", "i4": "entry.975431195", "s4": "entry.1429673478",
-  "link_foto": "entry.99241609", "tahun": "entry.2090096464_year", "bulan": "entry.2090096464_month", "tanggal": "entry.2090096464_day"
-};
-
-const GOOGLE_FORM_ID = '1FAIpQLSclDH_24SE9ECq-ti_qyQHSyBMoCsHAkRtdFT5Yrr1e7wIR4A';
-const FORM_ACTION_URL = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_ID}/formResponse`;
-
-// ==================== 3. FUNGSI UTAMA ====================
+// ==================== 2. STATE MANAGEMENT ====================
 let currentImageFile = null;
+let currentImageData = null;
+let debugMode = false;
+let formDataCache = {};
+let autoSaveTimer = null;
 
-function populateDays() {
-  const daySelect = document.getElementById('tanggal');
-  daySelect.innerHTML = '<option value="">Pilih Tanggal</option>';
-  for (let i = 1; i <= 31; i++) {
-    const day = i.toString().padStart(2, '0');
-    daySelect.innerHTML += `<option value="${day}">${i}</option>`;
-  }
-}
-
-// ==================== 4. FUNGSI GAMBAR ====================
-function handleCameraCapture(event) {
-  const file = event.target.files[0];
-  if (file) {
-    previewImage(file);
-    uploadImageToGitHub(file);
-  }
-}
-
-function handleFileUpload(event) {
-  const file = event.target.files[0];
-  if (file) {
-    if (file.size > 25 * 1024 * 1024) {
-      alert('Ukuran file terlalu besar! Maksimal 25MB.');
+// ==================== 3. FUNGSI KOMPRESI GAMBAR <500 KB ====================
+/**
+ * Kompresi gambar ke target < 500 KB
+ */
+function compressTo500KB(file, targetKB = 400, maxWidth = 1200) {
+  return new Promise((resolve, reject) => {
+    // Jika file sudah kecil, langsung return
+    if (file.size <= targetKB * 1024) {
+      resolve(file);
       return;
     }
-    previewImage(file);
-    uploadImageToGitHub(file);
+    
+    console.log(`📊 Kompresi: ${(file.size/1024).toFixed(1)}KB → target ${targetKB}KB`);
+    
+    const img = new Image();
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+      img.src = e.target.result;
+      
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 1. RESIZE: Sesuaikan dengan maxWidth
+        let width = img.width;
+        let height = img.height;
+        
+        // Untuk dokumentasi Prakerin, 1200px sudah cukup
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        
+        // Untuk foto dari HP yang sangat besar (>3000px), resize lebih agresif
+        if (file.size > 5 * 1024 * 1024 && width > 800) {
+          const scale = 800 / width;
+          width = 800;
+          height = Math.round(height * scale);
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // 2. DRAW dengan background putih (untuk PNG transparan)
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // 3. KOMPRESI ADAPTIF untuk target
+        const compressToTarget = async () => {
+          let quality = 0.8; // Mulai dari kualitas baik
+          let step = 0.15;   // Langkah penurunan
+          let minQuality = 0.4; // Kualitas minimum
+          let bestResult = null;
+          
+          for (let attempts = 0; attempts < 5; attempts++) {
+            const blob = await new Promise(resolveBlob => {
+              canvas.toBlob(resolveBlob, 'image/jpeg', quality);
+            });
+            
+            const sizeKB = blob.size / 1024;
+            
+            // Simpan hasil terbaik yang mendekati target
+            if (!bestResult || Math.abs(sizeKB - targetKB) < Math.abs(bestResult.sizeKB - targetKB)) {
+              bestResult = { blob, sizeKB, quality };
+            }
+            
+            // Jika sudah <= targetKB, berhenti
+            if (sizeKB <= targetKB) {
+              console.log(`  ✅ Target tercapai: ${sizeKB.toFixed(1)}KB (quality: ${quality.toFixed(2)})`);
+              return blob;
+            }
+            
+            // Turunkan kualitas untuk percobaan berikutnya
+            quality -= step;
+            if (quality < minQuality) {
+              console.log(`  ⚠️ Mencapai kualitas minimum: ${minQuality}`);
+              return bestResult.blob; // Gunakan hasil terbaik
+            }
+          }
+          
+          return bestResult.blob; // Gunakan hasil terbaik setelah 5 percobaan
+        };
+        
+        compressToTarget()
+          .then(blob => {
+            const compressedFile = new File(
+              [blob],
+              file.name.replace(/\.[^/.]+$/, '') + '_compressed.jpg',
+              { type: 'image/jpeg', lastModified: Date.now() }
+            );
+            
+            const finalKB = compressedFile.size / 1024;
+            const reduction = ((file.size - compressedFile.size) / file.size * 100).toFixed(1);
+            
+            console.log(`🎉 Final: ${(file.size/1024).toFixed(1)}KB → ${finalKB.toFixed(1)}KB (${reduction}% lebih kecil)`);
+            resolve(compressedFile);
+          })
+          .catch(reject);
+      };
+      
+      img.onerror = () => reject(new Error('Gagal memuat gambar'));
+    };
+    
+    reader.onerror = () => reject(new Error('Gagal membaca file'));
+    reader.readAsDataURL(file);
+  });
+}
+
+// ==================== 4. UI FEEDBACK UNTUK KOMPRESI ====================
+function updateCompressionUI(originalSize, compressedSize, status = 'processing') {
+  const container = document.querySelector('.compression-feedback');
+  const statsDiv = document.getElementById('compressionStats');
+  const staticInfo = document.getElementById('compressionInfoStatic');
+  const progressBar = document.getElementById('compressionProgressBar');
+  
+  // Update kelas status
+  container.className = 'compression-feedback p-3 rounded border ' + status;
+  
+  if (status === 'processing') {
+    // Tampilkan stats, sembunyikan static info
+    statsDiv.classList.remove('d-none');
+    staticInfo.classList.add('d-none');
+    
+    // Update numbers
+    const originalKB = (originalSize / 1024).toFixed(1);
+    const compressedKB = (compressedSize / 1024).toFixed(1);
+    const reduction = ((originalSize - compressedSize) / originalSize * 100).toFixed(1);
+    
+    document.getElementById('originalSizeText').textContent = `Asli: ${originalKB} KB`;
+    document.getElementById('compressedSizeText').textContent = `Hasil: ${compressedKB} KB`;
+    document.getElementById('reductionPercent').textContent = `${reduction}% lebih kecil`;
+    
+    // Update progress bar
+    const progressPercent = Math.min(100, (compressedSize / (500 * 1024)) * 100);
+    progressBar.style.width = `${progressPercent}%`;
+    progressBar.className = `progress-bar progress-bar-striped ${compressedSize <= 500*1024 ? 'bg-success' : 'bg-warning'}`;
+    
+  } else if (status === 'success') {
+    // Tampilkan final success message
+    statsDiv.classList.remove('d-none');
+    staticInfo.classList.add('d-none');
+    
+    const finalKB = (compressedSize / 1024).toFixed(0);
+    document.getElementById('compressedSizeText').innerHTML = 
+      `<i class="bi bi-check-circle me-1"></i><strong>${finalKB} KB</strong>`;
+    
+    // Progress bar 100% hijau
+    progressBar.style.width = '100%';
+    progressBar.className = 'progress-bar progress-bar-striped bg-success';
+    
+    // Auto-hide setelah 5 detik
+    setTimeout(() => {
+      statsDiv.classList.add('d-none');
+      staticInfo.classList.remove('d-none');
+      container.className = 'compression-feedback p-3 rounded border';
+    }, 5000);
+    
+  } else if (status === 'error') {
+    // Tampilkan error state
+    staticInfo.innerHTML = `
+      <i class="bi bi-exclamation-triangle me-1 text-danger"></i>
+      <span class="text-danger">Gagal mengkompresi gambar</span>
+      <br>
+      <small>Menggunakan file asli (pastikan &lt; 4MB)</small>
+    `;
+    statsDiv.classList.add('d-none');
   }
 }
 
-function previewImage(file) {
-  currentImageFile = file;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    document.getElementById('previewImage').src = e.target.result;
-    document.getElementById('imagePreview').style.display = 'block';
-  };
-  reader.readAsDataURL(file);
+// ==================== 5. HANDLE IMAGE CAPTURE DENGAN KOMPRESI ====================
+async function handleImageCapture(event) {
+  const file = event.target.files[0];
+  if (!file) return;
   
-  const fileSize = (file.size / (1024 * 1024)).toFixed(2);
-  document.getElementById('fileSize').textContent = `(${fileSize} MB)`;
-}
-
-function removeImage() {
-  currentImageFile = null;
-  document.getElementById('imagePreview').style.display = 'none';
-  document.getElementById('link_foto').value = '';
-  document.getElementById('uploadStatus').textContent = 'Belum ada gambar';
-  document.getElementById('fileSize').textContent = '';
-  document.getElementById('githubBtn').style.display = 'none';
-  document.getElementById('cameraInput').value = '';
-  document.getElementById('fileInput').value = '';
-}
-
-// ==================== 5. UPLOAD KE GITHUB ====================
-async function uploadImageToGitHub(file) {
-  const progressBar = document.getElementById('uploadProgress');
-  const progressBarInner = progressBar.querySelector('.progress-bar');
+  // 1. Validasi tipe file
+  if (!file.type.startsWith('image/')) {
+    showError('File harus berupa gambar (JPEG, PNG, dll.)');
+    return;
+  }
+  
+  // 2. Batas maksimum 10MB sebelum kompresi
+  const MAX_INITIAL_SIZE = 10 * 1024 * 1024; // 10MB
+  if (file.size > MAX_INITIAL_SIZE) {
+    showError(`⚠️ File terlalu besar! Maksimal 10MB.\nFile Anda: ${(file.size / (1024*1024)).toFixed(1)} MB`);
+    return;
+  }
+  
+  // 3. Tampilkan status "mengkompresi"
   const uploadStatus = document.getElementById('uploadStatus');
-  const linkInput = document.getElementById('link_foto');
-  const githubBtn = document.getElementById('githubBtn');
-  const debugInfo = document.getElementById('debugInfo');
-  const debugText = document.getElementById('debugText');
+  uploadStatus.innerHTML = '<i class="bi bi-hourglass-split me-1"></i><span>Mengkompresi gambar...</span>';
+  uploadStatus.className = 'status-indicator warning';
   
-  progressBar.style.display = 'block';
-  progressBarInner.style.width = '10%';
-  progressBarInner.textContent = '10%';
-  uploadStatus.textContent = 'Memulai upload...';
-  uploadStatus.className = 'text-info';
-  linkInput.value = '';
-  githubBtn.style.display = 'none';
-  debugInfo.classList.add('d-none');
+  // 4. Tampilkan UI feedback kompresi
+  updateCompressionUI(file.size, file.size, 'processing');
+  
+  // 5. Target kompresi: 400 KB (untuk safety margin)
+  const TARGET_KB = 400;
   
   try {
-    // 1. Cek token
-    if (GITHUB_CONFIG.token === 'MASUKKAN_TOKEN_GITHUB_ANDA_DISINI') {
-      throw new Error('Token GitHub belum diatur! Dapatkan token dari GitHub Settings → Developer Settings → Personal Access Tokens');
+    const originalKB = file.size / 1024;
+    
+    // Untuk file < 400KB, skip kompresi
+    if (originalKB <= TARGET_KB) {
+      console.log(`📦 File sudah kecil (${originalKB.toFixed(1)}KB), skip kompresi`);
+      currentImageFile = file;
+      previewImage(file);
+      uploadImageToServer(file);
+      updateCompressionUI(file.size, file.size, 'success');
+      return;
     }
     
-    // 2. Kompres gambar
-    uploadStatus.textContent = 'Mengompresi gambar...';
-    progressBarInner.style.width = '30%';
-    progressBarInner.textContent = '30%';
+    // Kompresi untuk file > 400KB
+    console.log(`🔧 Kompresi dimulai: ${originalKB.toFixed(1)}KB → target ${TARGET_KB}KB`);
     
-    const compressedFile = await compressImage(file);
-    const base64Content = await fileToBase64(compressedFile);
-    const base64Data = base64Content.split(',')[1];
+    const compressedFile = await compressTo500KB(file, TARGET_KB);
+    const finalKB = compressedFile.size / 1024;
+    const reduction = ((file.size - compressedFile.size) / file.size * 100).toFixed(1);
     
-    // 3. Buat nama file
-    const timestamp = Date.now();
-    const randomStr = Math.random().toString(36).substring(2, 10);
-    const filename = `img_${timestamp}_${randomStr}.jpg`;
-    const path = `${GITHUB_CONFIG.folder}/${filename}`;
+    // 6. Update UI dengan hasil kompresi
+    updateCompressionUI(file.size, compressedFile.size, 'success');
     
-    // 4. Debug info
-    debugText.textContent = `Mengupload: ${filename} (${(compressedFile.size/1024).toFixed(1)}KB) ke ${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/${path}`;
-    debugInfo.classList.remove('d-none');
+    // 7. Update status
+    uploadStatus.innerHTML = `<i class="bi bi-check-circle me-1"></i><span>Terkompresi: ${finalKB.toFixed(0)}KB</span>`;
+    uploadStatus.className = 'status-indicator success';
     
-    // 5. Upload ke GitHub API
-    uploadStatus.textContent = 'Mengupload ke GitHub...';
-    progressBarInner.style.width = '50%';
-    progressBarInner.textContent = '50%';
-    
-    const response = await fetch(
-      `https://api.github.com/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/contents/${path}`,
-      {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${GITHUB_CONFIG.token}`,
-          'Accept': 'application/vnd.github.v3+json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          message: `Upload dokumentasi - ${new Date().toLocaleDateString('id-ID')}`,
-          content: base64Data,
-          branch: GITHUB_CONFIG.branch
-        })
-      }
-    );
-    
-    // 6. Cek response
-    progressBarInner.style.width = '80%';
-    progressBarInner.textContent = '80%';
-    uploadStatus.textContent = 'Memproses respons...';
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      debugText.textContent += `\nError ${response.status}: ${errorText}`;
-      throw new Error(`GitHub API error ${response.status}: ${response.statusText}`);
-    }
-    
-    const data = await response.json();
-    console.log('GitHub response:', data);
-    
-    // 7. Dapatkan URL
-    const rawUrl = data.content.download_url
-      .replace('github.com', 'raw.githubusercontent.com')
-      .replace('/blob/', '/');
-    
-    // 8. Selesai
-    progressBarInner.style.width = '100%';
-    progressBarInner.textContent = '100%';
-    uploadStatus.textContent = 'Upload berhasil! ✅';
-    uploadStatus.className = 'text-success';
-    linkInput.value = rawUrl;
-    githubBtn.style.display = 'block';
-    
-    debugText.textContent += `\n✅ Berhasil! URL: ${rawUrl}`;
-    
-    // Simpan ke localStorage
-    localStorage.setItem('last_upload', JSON.stringify({
-      url: rawUrl,
-      githubUrl: data.content.html_url,
-      filename: filename,
-      timestamp: new Date().toISOString(),
-      size: compressedFile.size
-    }));
+    // 8. Gunakan file terkompresi
+    currentImageFile = compressedFile;
+    previewImage(compressedFile);
+    uploadImageToServer(compressedFile);
     
   } catch (error) {
-    console.error('Upload failed:', error);
-    progressBarInner.style.width = '100%';
-    progressBarInner.textContent = '100%';
-    uploadStatus.textContent = `Error: ${error.message}`;
-    uploadStatus.className = 'text-danger';
+    console.error('❌ Error kompresi:', error);
+    updateCompressionUI(file.size, file.size, 'error');
     
-    debugText.textContent += `\n❌ Error: ${error.message}`;
-    debugInfo.classList.remove('d-none');
-    
-    if (error.message.includes('401') || error.message.includes('token')) {
-      alert('⚠️ Token GitHub tidak valid!\n\nSilakan:\n1. Dapatkan token baru dari GitHub\n2. Ganti token di kode JavaScript\n3. Token harus memiliki permission "repo"');
+    // Fallback: jika kompresi gagal, coba upload file asli jika < 4MB
+    if (file.size <= 4 * 1024 * 1024) {
+      console.warn('⚠️ Kompresi gagal, menggunakan file asli');
+      showNotification('Peringatan', 'Kompresi gagal, menggunakan file asli', 'warning');
+      currentImageFile = file;
+      previewImage(file);
+      uploadImageToServer(file);
+    } else {
+      showError('Gagal mengkompresi gambar. Ukuran file melebihi batas.');
     }
-  } finally {
-    setTimeout(() => {
-      progressBar.style.display = 'none';
-      progressBarInner.style.width = '0%';
-      progressBarInner.textContent = '0%';
-    }, 3000);
   }
 }
 
-// ==================== 6. FUNGSI BANTUAN ====================
+// ==================== 6. FUNGSI BANTUAN LAINNYA ====================
+function previewImage(file) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const previewImg = document.getElementById('previewImage');
+    const placeholder = document.getElementById('previewPlaceholder');
+    
+    previewImg.src = e.target.result;
+    previewImg.classList.remove('d-none');
+    placeholder.classList.add('d-none');
+    
+    // Update file info
+    const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+    document.getElementById('fileSize').textContent = `${fileSize} MB`;
+    document.getElementById('fileSize').title = `${file.size} bytes`;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadImageToServer(file) {
+  const progressBar = document.getElementById('progressBar');
+  const uploadProgress = document.getElementById('uploadProgress');
+  const uploadStatus = document.getElementById('uploadStatus');
+  const uploadStatusText = document.getElementById('uploadStatusText');
+  const uploadPercentage = document.getElementById('uploadPercentage');
+  const uploadDetails = document.getElementById('uploadDetails');
+  const linkInput = document.getElementById('link_foto');
+  const githubBtn = document.getElementById('githubBtn');
+  
+  // Reset progress
+  progressBar.style.width = '0%';
+  progressBar.textContent = '0%';
+  uploadProgress.style.display = 'block';
+  uploadStatusText.textContent = 'Mengupload ke server...';
+  uploadPercentage.textContent = '0%';
+  uploadDetails.textContent = '';
+  
+  // Update status indicator
+  updateStatusIndicator(uploadStatus, 'Menyiapkan upload...', 'warning');
+  
+  try {
+    // Convert to base64
+    const base64Content = await fileToBase64(file);
+    const base64Data = base64Content.split(',')[1];
+    
+    // Upload to Vercel function
+    uploadStatusText.textContent = 'Mengupload ke server...';
+    progressBar.style.width = '60%';
+    progressBar.textContent = '60%';
+    updateStatusIndicator(uploadStatus, 'Mengupload...', 'warning');
+    
+    const response = await fetch(CONFIG.apiEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        image: base64Data,
+        filename: `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`
+      })
+    });
+    
+    // Process response
+    progressBar.style.width = '80%';
+    progressBar.textContent = '80%';
+    uploadStatusText.textContent = 'Memproses...';
+    
+    // Debug raw response
+    const responseText = await response.text();
+    console.log('📄 Raw response:', responseText);
+    
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('❌ Failed to parse JSON:', parseError);
+      throw new Error(`Server returned invalid JSON. Status: ${response.status}`);
+    }
+    
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || `Upload failed: ${response.status}`);
+    }
+    
+    // Success
+    progressBar.style.width = '100%';
+    progressBar.textContent = '100%';
+    uploadStatusText.textContent = 'Upload berhasil!';
+    uploadPercentage.textContent = '100%';
+    
+    // Update link input
+    linkInput.value = data.data.url;
+    githubBtn.style.display = 'inline-block';
+    
+    // Update status
+    updateStatusIndicator(uploadStatus, 'Upload berhasil', 'success');
+    
+    // Show details
+    uploadDetails.textContent = `File: ${data.data.filename} | Size: ${(data.data.size / 1024).toFixed(1)} KB`;
+    
+    // Save to localStorage
+    const uploadInfo = {
+      url: data.data.url,
+      githubUrl: data.data.githubUrl,
+      filename: data.data.filename,
+      timestamp: data.data.uploadDate,
+      size: data.data.size
+    };
+    
+    localStorage.setItem('last_upload', JSON.stringify(uploadInfo));
+    localStorage.setItem('last_upload_time', new Date().toISOString());
+    
+    console.log(`✅ Upload berhasil: ${data.data.url}`);
+    showNotification('Upload Berhasil', 'Gambar berhasil diupload ke server.', 'success');
+    
+    // Auto-hide progress after 3 seconds
+    setTimeout(() => {
+      uploadProgress.style.display = 'none';
+    }, 3000);
+    
+    return data.data.url;
+    
+  } catch (error) {
+    console.error('Upload error:', error);
+    
+    // Update progress bar to show error
+    progressBar.style.width = '100%';
+    progressBar.textContent = 'Error!';
+    progressBar.classList.remove('bg-primary');
+    progressBar.classList.add('bg-danger');
+    
+    uploadStatusText.textContent = 'Upload gagal';
+    uploadPercentage.textContent = 'Error';
+    
+    // Update status indicator
+    updateStatusIndicator(uploadStatus, `Error: ${error.message}`, 'error');
+    
+    uploadDetails.textContent = error.message;
+    
+    console.error(`Upload error: ${error.message}`);
+    showNotification('Upload Gagal', error.message, 'error');
+    
+    // Reset progress bar color after error
+    setTimeout(() => {
+      progressBar.classList.remove('bg-danger');
+      progressBar.classList.add('bg-primary');
+    }, 5000);
+    
+    throw error;
+  }
+}
+
+// ==================== 7. FUNGSI BANTUAN ====================
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -553,244 +1283,567 @@ function fileToBase64(file) {
   });
 }
 
-async function compressImage(file, maxWidth = 1200, quality = 0.7) {
-  return new Promise((resolve) => {
-    if (file.size < 500 * 1024 || !file.type.startsWith('image/')) {
-      resolve(file);
-      return;
-    }
-    
-    const img = new Image();
-    const reader = new FileReader();
-    
-    reader.onload = function(e) {
-      img.src = e.target.result;
-      img.onload = function() {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        let width = img.width;
-        let height = img.height;
-        
-        if (width > maxWidth) {
-          height = Math.round(height * maxWidth / width);
-          width = maxWidth;
-        }
-        
-        canvas.width = width;
-        canvas.height = height;
-        ctx.drawImage(img, 0, 0, width, height);
-        
-        canvas.toBlob(
-          (blob) => {
-            const compressedFile = new File([blob], 'image.jpg', { type: 'image/jpeg', lastModified: Date.now() });
-            resolve(compressedFile);
-          },
-          'image/jpeg',
-          quality
-        );
-      };
-      img.onerror = () => resolve(file);
-    };
-    
-    reader.readAsDataURL(file);
-  });
+function updateStatusIndicator(element, text, type) {
+  const icons = {
+    'success': 'check-circle',
+    'error': 'exclamation-circle',
+    'warning': 'exclamation-triangle',
+    'info': 'info-circle'
+  };
+  
+  element.innerHTML = `
+    <i class="bi bi-${icons[type] || 'info-circle'} me-1"></i>
+    <span>${text}</span>
+  `;
+  element.className = `status-indicator ${type}`;
+}
+
+function removeImage() {
+  if (!confirm('Hapus gambar yang diupload?')) return;
+  
+  currentImageFile = null;
+  currentImageData = null;
+  
+  // Reset preview
+  document.getElementById('previewImage').classList.add('d-none');
+  document.getElementById('previewImage').src = '';
+  document.getElementById('previewPlaceholder').classList.remove('d-none');
+  
+  // Reset inputs
+  document.getElementById('link_foto').value = '';
+  document.getElementById('githubBtn').style.display = 'none';
+  document.getElementById('cameraInput').value = '';
+  document.getElementById('fileInput').value = '';
+  
+  // Reset status
+  updateStatusIndicator(
+    document.getElementById('uploadStatus'), 
+    'Belum ada gambar', 
+    'info'
+  );
+  document.getElementById('fileSize').textContent = '';
+  document.getElementById('uploadProgress').style.display = 'none';
+  
+  // Reset compression UI
+  const compressionUI = document.querySelector('.compression-feedback');
+  compressionUI.className = 'compression-feedback p-3 rounded border';
+  document.getElementById('compressionStats').classList.add('d-none');
+  document.getElementById('compressionInfoStatic').classList.remove('d-none');
+  
+  // Clear localStorage
+  localStorage.removeItem('last_upload');
+  localStorage.removeItem('last_upload_time');
+  
+  console.log('🗑️ Gambar dihapus');
+  showNotification('Gambar Dihapus', 'Gambar telah dihapus dari form.', 'warning');
 }
 
 function copyLink() {
   const linkInput = document.getElementById('link_foto');
-  if (linkInput.value) {
-    navigator.clipboard.writeText(linkInput.value)
-      .then(() => alert('Link berhasil disalin!'))
-      .catch(() => {
-        linkInput.select();
-        document.execCommand('copy');
-        alert('Link disalin!');
-      });
+  if (!linkInput.value) {
+    showError('Tidak ada link untuk disalin');
+    return;
   }
+  
+  navigator.clipboard.writeText(linkInput.value)
+    .then(() => {
+      showNotification('Link Disalin', 'Link berhasil disalin ke clipboard.', 'success');
+    })
+    .catch(() => {
+      // Fallback for older browsers
+      linkInput.select();
+      document.execCommand('copy');
+      showNotification('Link Disalin', 'Link berhasil disalin.', 'success');
+    });
 }
 
 function viewOnGitHub() {
   const linkInput = document.getElementById('link_foto').value;
   if (linkInput) {
-    if (linkInput.includes('raw.githubusercontent.com')) {
-      const githubUrl = linkInput
-        .replace('raw.githubusercontent.com', 'github.com')
-        .replace('/' + GITHUB_CONFIG.branch + '/', '/blob/' + GITHUB_CONFIG.branch + '/');
-      window.open(githubUrl, '_blank');
-    } else {
-      window.open(linkInput, '_blank');
-    }
+    window.open(linkInput, '_blank');
   }
 }
 
-async function testGitHubConnection() {
-  const debugInfo = document.getElementById('debugInfo');
-  const debugText = document.getElementById('debugText');
-  
-  debugInfo.classList.remove('d-none');
-  debugText.textContent = '🔄 Menguji koneksi ke GitHub...';
-  
-  try {
-    // Test 1: Cek repository
-    const response = await fetch(
-      `https://api.github.com/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${GITHUB_CONFIG.token}`,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      }
-    );
-    
-    if (response.ok) {
-      const repoData = await response.json();
-      debugText.textContent = `✅ Repository ditemukan: ${repoData.full_name}\n`;
-      debugText.textContent += `📁 Default branch: ${repoData.default_branch}\n`;
-      debugText.textContent += `👤 Pemilik: ${repoData.owner.login}\n`;
-      debugText.textContent += `🔗 URL: ${repoData.html_url}`;
-    } else {
-      debugText.textContent = `❌ Repository tidak ditemukan atau tidak dapat diakses\n`;
-      debugText.textContent += `Status: ${response.status} ${response.statusText}`;
-    }
-  } catch (error) {
-    debugText.textContent = `❌ Error: ${error.message}`;
-  }
-}
-
-function resetForm() {
-  if (confirm('Apakah Anda yakin ingin mengosongkan semua data?')) {
-    document.getElementById('monitoringForm').reset();
-    removeImage();
-    populateDays();
-    document.getElementById('successAlert').classList.add('d-none');
-    document.getElementById('errorAlert').classList.add('d-none');
-    document.getElementById('debugInfo').classList.add('d-none');
-    
-    const now = new Date();
-    document.getElementById('tahun').value = now.getFullYear().toString();
-    document.getElementById('bulan').value = (now.getMonth() + 1).toString().padStart(2, '0');
-    document.getElementById('tanggal').value = now.getDate().toString().padStart(2, '0');
-  }
-}
-
-// ==================== 7. SUBMIT KE GOOGLE FORMS ====================
-document.getElementById('monitoringForm').addEventListener('submit', function(e) {
+// ==================== 8. FORM SUBMISSION ====================
+document.getElementById('monitoringForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   
-  const requiredFields = ['nama', 'kompetensi', 'nama_perusahaan', 'alamat_perusahaan'];
-  for (const field of requiredFields) {
-    const value = document.getElementById(field).value.trim();
-    if (!value) {
-      alert(`Field "${field.replace('_', ' ')}" harus diisi!`);
-      document.getElementById(field).focus();
+  // Validate form
+  if (!validateForm()) return;
+  
+  // Check if image is required
+  const linkFoto = document.getElementById('link_foto').value;
+  if (!linkFoto) {
+    if (!confirm('Anda belum mengupload dokumentasi. Lanjutkan tanpa gambar?')) {
       return;
     }
   }
   
-  document.getElementById('submitText').classList.add('d-none');
-  document.getElementById('loadingSpinner').classList.remove('d-none');
-  document.getElementById('successAlert').classList.add('d-none');
-  document.getElementById('errorAlert').classList.add('d-none');
+  // Disable submit button
+  const submitBtn = document.querySelector('button[type="submit"]');
+  const originalText = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = `
+    <i class="bi bi-hourglass-split me-2"></i>
+    <span>Mengirim data...</span>
+    <span class="spinner-border spinner-border-sm ms-2"></span>
+  `;
   
   try {
+    // Prepare form data
     const formData = {};
-    Object.keys(ENTRY_IDS).forEach(key => {
+    Object.keys(CONFIG.googleForm.entryIds).forEach(key => {
       const element = document.getElementById(key);
-      if (element) formData[key] = element.value || '';
+      formData[key] = element ? (element.value || '') : '';
     });
     
-    const hiddenForm = document.createElement('form');
-    hiddenForm.method = 'POST';
-    hiddenForm.action = FORM_ACTION_URL;
-    hiddenForm.target = '_blank';
-    hiddenForm.style.display = 'none';
+    // Submit to Google Form
+    await submitToGoogleForm(formData);
     
-    Object.entries(ENTRY_IDS).forEach(([fieldName, entryId]) => {
-      if (formData[fieldName]) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = entryId;
-        input.value = formData[fieldName];
-        hiddenForm.appendChild(input);
-      }
-    });
+    // Show success message
+    document.getElementById('successAlert').classList.remove('d-none');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    const iframe = document.createElement('iframe');
-    iframe.name = 'googleformiframe';
-    iframe.style.display = 'none';
-    document.body.appendChild(iframe);
-    hiddenForm.target = 'googleformiframe';
-    document.body.appendChild(hiddenForm);
-    hiddenForm.submit();
-    
+    // Clear form
     setTimeout(() => {
-      document.getElementById('successAlert').classList.remove('d-none');
-      document.getElementById('submitText').classList.remove('d-none');
-      document.getElementById('loadingSpinner').classList.add('d-none');
-      
-      setTimeout(() => {
-        resetForm();
-        document.body.removeChild(hiddenForm);
-        document.body.removeChild(iframe);
-      }, 2000);
-      
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 1000);
+      resetForm();
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalText;
+      showNotification('Data Terkirim', 'Data berhasil dikirim ke Google Forms.', 'success');
+    }, 2000);
     
   } catch (error) {
     console.error('Submit error:', error);
+    
+    // Show error message
     document.getElementById('errorMessage').textContent = error.message;
     document.getElementById('errorAlert').classList.remove('d-none');
-    document.getElementById('submitText').classList.remove('d-none');
-    document.getElementById('loadingSpinner').classList.add('d-none');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Re-enable button
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalText;
+    
+    showNotification('Gagal Mengirim', error.message, 'error');
   }
 });
 
-// ==================== 8. LOGOUT ====================
-function logout() {
-  localStorage.removeItem("login_user");
-  localStorage.removeItem("login_name");
-  localStorage.removeItem("login_time");
-  location.href = "index.html";
+function validateForm() {
+  const requiredFields = ['nama', 'kompetensi', 'nama_perusahaan', 'alamat_perusahaan'];
+  let isValid = true;
+  
+  requiredFields.forEach(field => {
+    const element = document.getElementById(field);
+    if (!element.value.trim()) {
+      element.classList.add('is-invalid');
+      isValid = false;
+      
+      // Scroll to first error
+      if (isValid === false) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.focus();
+      }
+    } else {
+      element.classList.remove('is-invalid');
+    }
+  });
+  
+  return isValid;
 }
 
-// ==================== 9. INISIALISASI ====================
-document.addEventListener('DOMContentLoaded', function() {
-  populateDays();
+async function submitToGoogleForm(formData) {
+  return new Promise((resolve, reject) => {
+    try {
+      const formUrl = `https://docs.google.com/forms/d/e/${CONFIG.googleForm.id}/formResponse`;
+      
+      // Create hidden form
+      const hiddenForm = document.createElement('form');
+      hiddenForm.method = 'POST';
+      hiddenForm.action = formUrl;
+      hiddenForm.target = '_blank';
+      hiddenForm.style.display = 'none';
+      
+      // Add form data
+      Object.entries(CONFIG.googleForm.entryIds).forEach(([fieldName, entryId]) => {
+        if (formData[fieldName]) {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = entryId;
+          input.value = formData[fieldName];
+          hiddenForm.appendChild(input);
+        }
+      });
+      
+      // Create hidden iframe for submission
+      const iframe = document.createElement('iframe');
+      iframe.name = 'googleformiframe';
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+      
+      hiddenForm.target = 'googleformiframe';
+      document.body.appendChild(hiddenForm);
+      
+      // Submit form
+      hiddenForm.submit();
+      
+      // Cleanup
+      setTimeout(() => {
+        document.body.removeChild(hiddenForm);
+        document.body.removeChild(iframe);
+        resolve();
+      }, 1000);
+      
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+// ==================== 9. FORM MANAGEMENT ====================
+function resetForm() {
+  if (!confirm('Reset semua data dalam form?')) return;
+  
+  // Reset form elements
+  document.getElementById('monitoringForm').reset();
+  
+  // Reset date controls
+  populateDateControls();
+  
+  // Remove image
+  removeImage();
+  
+  // Hide alerts
+  document.getElementById('successAlert').classList.add('d-none');
+  document.getElementById('errorAlert').classList.add('d-none');
+  
+  // Clear form cache
+  formDataCache = {};
+  localStorage.removeItem('form_draft');
+  
+  // Update last saved time
+  document.getElementById('lastSaved').textContent = '-';
+  
+  showNotification('Form Direset', 'Semua data telah dihapus.', 'warning');
+}
+
+function saveDraft() {
+  const formData = {};
+  Object.keys(CONFIG.googleForm.entryIds).forEach(key => {
+    const element = document.getElementById(key);
+    if (element) formData[key] = element.value || '';
+  });
+  
+  // Save image data if exists
+  if (currentImageData) {
+    formData._imagePreview = currentImageData;
+  }
+  
+  // Save to localStorage
+  localStorage.setItem('form_draft', JSON.stringify({
+    data: formData,
+    timestamp: new Date().toISOString()
+  }));
+  
+  // Update last saved time
+  const now = new Date();
+  document.getElementById('lastSaved').textContent = 
+    `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+  
+  showNotification('Draft Disimpan', 'Data telah disimpan secara lokal.', 'success');
+}
+
+function loadFormDraft() {
+  try {
+    const draft = localStorage.getItem('form_draft');
+    if (!draft) return;
+    
+    const { data, timestamp } = JSON.parse(draft);
+    
+    // Load form data
+    Object.keys(data).forEach(key => {
+      if (key.startsWith('_')) return; // Skip metadata
+      
+      const element = document.getElementById(key);
+      if (element && data[key]) {
+        element.value = data[key];
+      }
+    });
+    
+    // Load image preview if exists
+    if (data._imagePreview) {
+      currentImageData = data._imagePreview;
+      document.getElementById('previewImage').src = data._imagePreview;
+      document.getElementById('previewImage').classList.remove('d-none');
+      document.getElementById('previewPlaceholder').classList.add('d-none');
+      
+      updateStatusIndicator(
+        document.getElementById('uploadStatus'), 
+        'Gambar dari draft', 
+        'warning'
+      );
+    }
+    
+    // Update last saved time
+    if (timestamp) {
+      const savedTime = new Date(timestamp);
+      document.getElementById('lastSaved').textContent = 
+        `${savedTime.getHours().toString().padStart(2, '0')}:${savedTime.getMinutes().toString().padStart(2, '0')}`;
+    }
+    
+  } catch (error) {
+    console.error('Error loading draft:', error);
+    localStorage.removeItem('form_draft');
+  }
+}
+
+// ==================== 10. UTILITY FUNCTIONS ====================
+function showNotification(title, message, type = 'info') {
+  const notification = document.getElementById('floatingNotification');
+  const icon = document.getElementById('notificationIcon');
+  const titleEl = document.getElementById('notificationTitle');
+  const messageEl = document.getElementById('notificationMessage');
+  
+  // Set icon based on type
+  let iconClass = 'bi-info-circle';
+  let bgColor = 'bg-primary';
+  
+  switch(type) {
+    case 'success':
+      iconClass = 'bi-check-circle';
+      bgColor = 'bg-success';
+      break;
+    case 'error':
+      iconClass = 'bi-exclamation-circle';
+      bgColor = 'bg-danger';
+      break;
+    case 'warning':
+      iconClass = 'bi-exclamation-triangle';
+      bgColor = 'bg-warning';
+      break;
+  }
+  
+  icon.innerHTML = `<i class="bi ${iconClass} text-white ${bgColor} rounded-circle p-2"></i>`;
+  titleEl.textContent = title;
+  messageEl.textContent = message;
+  
+  notification.classList.remove('d-none');
+  
+  // Auto-hide after 5 seconds
+  setTimeout(() => {
+    if (notification.classList.contains('d-none')) return;
+    hideNotification();
+  }, 5000);
+}
+
+function hideNotification() {
+  document.getElementById('floatingNotification').classList.add('d-none');
+}
+
+function showError(message) {
+  showNotification('Terjadi Kesalahan', message, 'error');
+}
+
+// ==================== 11. INITIALIZATION ====================
+function initApp() {
+  // Set nama guru dari localStorage
+  const userName = localStorage.getItem("login_name") || "Guru";
+  document.getElementById("namaGuru").textContent = userName;
+  document.getElementById("namaGuruDisplay").textContent = userName;
+  
+  // Setup form controls
+  populateDateControls();
+  loadFormDraft();
+  startSessionTimer();
+  startAutoSave();
+  
+  // Check for previous upload
+  checkPreviousUpload();
+  
+  showNotification('Aplikasi siap', 'Dashboard monitoring telah dimuat.', 'success');
+}
+
+function populateDateControls() {
+  const yearSelect = document.getElementById('tahun');
+  const monthSelect = document.getElementById('bulan');
+  const daySelect = document.getElementById('tanggal');
   
   const now = new Date();
-  document.getElementById('tahun').value = now.getFullYear().toString();
-  document.getElementById('bulan').value = (now.getMonth() + 1).toString().padStart(2, '0');
-  document.getElementById('tanggal').value = now.getDate().toString().padStart(2, '0');
+  const currentYear = now.getFullYear();
   
-  const lastUpload = localStorage.getItem('last_upload');
-  if (lastUpload) {
-    try {
-      const data = JSON.parse(lastUpload);
-      if (data.url) {
-        document.getElementById('link_foto').value = data.url;
-        document.getElementById('uploadStatus').textContent = `Gambar terakhir: ${data.filename || 'terupload'}`;
-        document.getElementById('uploadStatus').className = 'text-success';
-        document.getElementById('githubBtn').style.display = 'block';
-        
-        if (data.url.startsWith('http')) {
-          document.getElementById('previewImage').src = data.url;
-          document.getElementById('imagePreview').style.display = 'block';
-        }
-      }
-    } catch (e) {
-      console.log('No previous upload found');
+  // Populate years
+  yearSelect.innerHTML = '<option value="">Pilih Tahun</option>';
+  for (let year = 2020; year <= 2030; year++) {
+    const selected = year === currentYear ? 'selected' : '';
+    yearSelect.innerHTML += `<option value="${year}" ${selected}>${year}</option>`;
+  }
+  
+  // Populate months
+  const months = [
+    { value: '01', name: 'Januari' }, { value: '02', name: 'Februari' },
+    { value: '03', name: 'Maret' }, { value: '04', name: 'April' },
+    { value: '05', name: 'Mei' }, { value: '06', name: 'Juni' },
+    { value: '07', name: 'Juli' }, { value: '08', name: 'Agustus' },
+    { value: '09', name: 'September' }, { value: '10', name: 'Oktober' },
+    { value: '11', name: 'November' }, { value: '12', name: 'Desember' }
+  ];
+  
+  monthSelect.innerHTML = '<option value="">Pilih Bulan</option>';
+  months.forEach(month => {
+    const selected = parseInt(month.value) === (now.getMonth() + 1) ? 'selected' : '';
+    monthSelect.innerHTML += `<option value="${month.value}" ${selected}>${month.name}</option>`;
+  });
+  
+  // Populate days
+  updateDaySelect();
+  
+  // Event listeners for date changes
+  yearSelect.addEventListener('change', updateDaySelect);
+  monthSelect.addEventListener('change', updateDaySelect);
+}
+
+function updateDaySelect() {
+  const year = parseInt(document.getElementById('tahun').value);
+  const month = parseInt(document.getElementById('bulan').value);
+  const daySelect = document.getElementById('tanggal');
+  
+  if (!year || !month) {
+    daySelect.innerHTML = '<option value="">Pilih Tanggal</option>';
+    return;
+  }
+  
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const now = new Date();
+  const currentDay = (year === now.getFullYear() && month === (now.getMonth() + 1)) ? now.getDate() : null;
+  
+  daySelect.innerHTML = '<option value="">Pilih Tanggal</option>';
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dayStr = day.toString().padStart(2, '0');
+    const selected = (currentDay && day === currentDay) ? 'selected' : '';
+    daySelect.innerHTML += `<option value="${dayStr}" ${selected}>${day}</option>`;
+  }
+}
+
+function startSessionTimer() {
+  const loginTime = parseInt(localStorage.getItem("login_time") || Date.now());
+  const timerElement = document.getElementById('sessionTimer');
+  
+  function updateTimer() {
+    const elapsed = Date.now() - loginTime;
+    const remaining = Math.max(0, CONFIG.sessionTimeout - elapsed);
+    
+    const minutes = Math.floor(remaining / 60000);
+    const seconds = Math.floor((remaining % 60000) / 1000);
+    
+    timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    if (remaining < 5 * 60 * 1000 && remaining > 0) {
+      timerElement.classList.add('text-warning');
+    }
+    
+    if (remaining <= 0) {
+      logout();
     }
   }
   
-  if (GITHUB_CONFIG.token === 'MASUKKAN_TOKEN_GITHUB_ANDA_DISINI') {
-    console.warn('⚠️ Token GitHub belum diatur!');
-    document.getElementById('uploadStatus').textContent = '⚠️ Token GitHub belum diatur';
-    document.getElementById('uploadStatus').className = 'text-warning';
+  updateTimer();
+  setInterval(updateTimer, 1000);
+  
+  const resetTimer = () => {
+    localStorage.setItem("login_time", Date.now());
+  };
+  
+  ['click', 'mousemove', 'keydown', 'scroll'].forEach(event => {
+    document.addEventListener(event, resetTimer);
+  });
+}
+
+function startAutoSave() {
+  autoSaveTimer = setInterval(() => {
+    saveDraft();
+  }, CONFIG.autoSaveInterval);
+}
+
+function logout() {
+  if (autoSaveTimer) {
+    clearInterval(autoSaveTimer);
   }
-});
+  
+  localStorage.removeItem("login_user");
+  localStorage.removeItem("login_name");
+  localStorage.removeItem("login_time");
+  
+  location.href = "index.html";
+}
+
+function checkPreviousUpload() {
+  try {
+    const lastUpload = localStorage.getItem('last_upload');
+    const lastUploadTime = localStorage.getItem('last_upload_time');
+    
+    if (lastUpload && lastUploadTime) {
+      const uploadData = JSON.parse(lastUpload);
+      const uploadTime = new Date(lastUploadTime);
+      const now = new Date();
+      const hoursDiff = (now - uploadTime) / (1000 * 60 * 60);
+      
+      if (hoursDiff < 24 && uploadData.url) {
+        document.getElementById('link_foto').value = uploadData.url;
+        document.getElementById('githubBtn').style.display = 'inline-block';
+        
+        updateStatusIndicator(
+          document.getElementById('uploadStatus'), 
+          `Gambar terakhir: ${uploadData.filename || 'terupload'}`,
+          'success'
+        );
+        
+        if (uploadData.url.startsWith('http')) {
+          document.getElementById('previewImage').src = uploadData.url;
+          document.getElementById('previewImage').classList.remove('d-none');
+          document.getElementById('previewPlaceholder').classList.add('d-none');
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error checking previous upload:', error);
+  }
+}
+
+// ==================== 12. DEBUG FUNCTIONS ====================
+function toggleDebugMode() {
+  debugMode = !debugMode;
+  document.getElementById('debugPanel').classList.toggle('d-none', !debugMode);
+  
+  if (debugMode) {
+    showNotification('Debug Mode', 'Mode debug diaktifkan.', 'info');
+  }
+}
+
+function clearDebugLog() {
+  document.getElementById('debugText').textContent = '';
+}
+
+function testAPIConnection() {
+  showNotification('Testing', 'Menguji koneksi API...', 'info');
+  
+  fetch(CONFIG.apiEndpoint, { method: 'OPTIONS' })
+    .then(response => {
+      if (response.ok) {
+        showNotification('Koneksi OK', 'API endpoint berhasil diakses.', 'success');
+      } else {
+        showNotification('Koneksi Gagal', `API error: ${response.status}`, 'error');
+      }
+    })
+    .catch(error => {
+      showNotification('Koneksi Gagal', `API tidak dapat diakses: ${error.message}`, 'error');
+    });
+}
+
+// ==================== 13. INITIALIZE APP ====================
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
 </script>
 </body>
 </html>
