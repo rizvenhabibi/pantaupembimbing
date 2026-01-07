@@ -1,20 +1,18 @@
+// netlify/functions/upload.js
 const { Octokit } = require("@octokit/rest");
 
-export const handler = async (event, context) => {
-  // ==================== CORS HEADERS ====================
+exports.handler = async (event, context) => {
+  // === 1. HANDLE CORS & PREFLIGHT ===
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json'
+    'Access-Control-Allow-Headers': 'Content-Type'
   };
 
-  // Handle preflight (OPTIONS)
   if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+    return { statusCode: 204, headers };
   }
 
-  // Hanya izinkan POST
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -26,10 +24,20 @@ export const handler = async (event, context) => {
   try {
     console.log('🚀 Upload request received (Netlify)');
 
-    // ==================== VALIDASI & PARSING REQUEST ====================
-    // Netlify mengirim body dalam bentuk string, kita perlu mem-parse-nya
-    const body = JSON.parse(event.body || '{}');
-    const { image, filename } = body;
+    // === 2. PARSE REQUEST ===
+    let body;
+    try {
+      body = JSON.parse(event.body);
+    } catch (parseError) {
+      console.error('Error parsing JSON:', parseError);
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'Invalid JSON in request body' })
+      };
+    }
+
+    let { image, filename } = body;
 
     if (!image) {
       return {
@@ -39,7 +47,16 @@ export const handler = async (event, context) => {
       };
     }
 
-    // ==================== VALIDASI ENVIRONMENT VARIABLES ====================
+    // === 3. VALIDASI & EKSTRAKSI BASE64 ===
+    // **Perbaikan penting:** Hilangkan 'data:image/...;base64,' prefix jika ada
+    let base64Data;
+    if (image.startsWith('data:image/')) {
+      base64Data = image.split(',')[1];
+    } else {
+      base64Data = image;
+    }
+
+    // === 4. LOAD ENV VARS ===
     const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
     const GITHUB_USERNAME = process.env.GITHUB_USERNAME || 'rizvenhabibi';
     const GITHUB_REPO = process.env.GITHUB_REPO || 'pantaupembimbing';
@@ -55,24 +72,19 @@ export const handler = async (event, context) => {
       };
     }
 
-    // ==================== SETUP OCTOKIT ====================
-    const octokit = new Octokit({
-      auth: GITHUB_TOKEN,
-      userAgent: 'Prakerin-Monitoring-App/1.0'
-    });
-
+    // === 5. SETUP & UPLOAD KE GITHUB ===
+    const octokit = new Octokit({ auth: GITHUB_TOKEN });
     const finalFilename = filename || `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`;
     const filePath = `${GITHUB_FOLDER}/${finalFilename}`;
 
     console.log(`📁 Uploading to: ${GITHUB_USERNAME}/${GITHUB_REPO}/${filePath}`);
 
-    // ==================== UPLOAD KE GITHUB ====================
     const result = await octokit.repos.createOrUpdateFileContents({
       owner: GITHUB_USERNAME,
       repo: GITHUB_REPO,
       path: filePath,
       message: `📷 Upload dokumentasi - ${new Date().toLocaleDateString('id-ID')}`,
-      content: image, // Base64 string
+      content: base64Data, // Gunakan base64Data yang sudah dibersihkan
       branch: GITHUB_BRANCH,
       committer: {
         name: 'Monitoring Prakerin App',
@@ -80,9 +92,11 @@ export const handler = async (event, context) => {
       }
     });
 
-    let rawUrl = result.data.content.download_url;
+    // === 6. BUILD RESPONSE URL ===
+    // GitHub API tidak selalu konsisten memberikan download_url, lebih baik buat sendiri
+    const rawUrl = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${GITHUB_REPO}/${GITHUB_BRANCH}/${filePath}`;
 
-    // ==================== RESPONSE SUKSES ====================
+    // === 7. RETURN SUCCESS ===
     return {
       statusCode: 200,
       headers,
@@ -90,29 +104,26 @@ export const handler = async (event, context) => {
         success: true,
         message: 'Image uploaded successfully to GitHub',
         data: {
-          url: rawUrl,
-          githubUrl: result.data.content.html_url,
+          url: rawUrl, // Gunakan URL yang kita buat
+          githubUrl: `https://github.com/${GITHUB_USERNAME}/${GITHUB_REPO}/blob/${GITHUB_BRANCH}/${filePath}`,
+          rawUrl: rawUrl,
           filename: finalFilename,
           path: filePath,
-          size: Math.round((image.length * 3) / 4),
-          uploadDate: new Date().toISOString(),
-          viewUrl: `https://github.com/${GITHUB_USERNAME}/${GITHUB_REPO}/blob/${GITHUB_BRANCH}/${filePath}`
+          size: Math.round((base64Data.length * 3) / 4),
+          uploadDate: new Date().toISOString()
         }
       })
     };
 
   } catch (error) {
     console.error('❌ Upload error:', error);
-    
-    let statusCode = error.status || 500;
-    let errorMessage = error.message || 'Upload failed';
 
     return {
-      statusCode,
+      statusCode: error.status || 500,
       headers,
       body: JSON.stringify({
         success: false,
-        error: errorMessage
+        error: error.message || 'Upload failed'
       })
     };
   }
