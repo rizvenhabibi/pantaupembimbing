@@ -66,6 +66,14 @@
     .btn-submit:active {
       transform: translateY(0);
     }
+    
+    /* State untuk button disabled */
+    .btn-submit:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
 
     .ais-row { 
       background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
@@ -745,7 +753,7 @@
 
           <!-- Action Buttons -->
           <div class="text-center mt-5 pt-4 border-top">
-            <button type="submit" class="btn btn-submit text-white me-3">
+            <button type="submit" class="btn btn-submit text-white me-3" id="submitButton">
               <i class="bi bi-send-check me-2"></i>
               <span id="submitText">Kirim Data Monitoring</span>
               <span id="loadingSpinner" class="spinner-border spinner-border-sm ms-2 d-none"></span>
@@ -873,6 +881,7 @@
   let debugMode = false;
   let formDataCache = {};
   let autoSaveTimer = null;
+  let isSubmitting = false; // FLAG UNTUK MENCEGAH DOUBLE SUBMIT
 
   // ==================== 3. FUNGSI KOMPRESI GAMBAR <500 KB ====================
   function compressTo500KB(file, targetKB = 400, maxWidth = 1200) {
@@ -1073,7 +1082,7 @@
       
       currentImageFile = compressedFile;
       previewImage(compressedFile);
-      uploadImageToServer(compressedFile);
+      await uploadImageToServer(compressedFile); // MENGGUNAKAN AWAIT
       
     } catch (error) {
       console.error('❌ Error kompresi:', error);
@@ -1084,7 +1093,7 @@
         showNotification('Peringatan', 'Kompresi gagal, menggunakan file asli', 'warning');
         currentImageFile = file;
         previewImage(file);
-        uploadImageToServer(file);
+        await uploadImageToServer(file); // MENGGUNAKAN AWAIT
       } else {
         showError('Gagal mengkompresi gambar. Ukuran file melebihi batas.');
       }
@@ -1140,7 +1149,7 @@
       progressBar.textContent = '60%';
       updateStatusIndicator(uploadStatus, 'Mengupload...', 'warning');
       
-      // Kirim ke Netlify Function
+      // Kirim ke Netlify Function - MENGGUNAKAN AWAIT
       const response = await fetch(CONFIG.apiEndpoint, {
         method: 'POST',
         headers: {
@@ -1333,6 +1342,12 @@
   document.getElementById('monitoringForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
+    // CEGAH DOUBLE SUBMIT
+    if (isSubmitting) {
+      console.log('⏳ Submit sedang berjalan, mencegah double submit...');
+      return;
+    }
+    
     if (!validateForm()) return;
     
     const linkFoto = document.getElementById('link_foto').value;
@@ -1342,7 +1357,9 @@
       }
     }
     
-    const submitBtn = document.querySelector('button[type="submit"]');
+    // SET FLAG SUBMIT
+    isSubmitting = true;
+    const submitBtn = document.getElementById('submitButton');
     const originalText = submitBtn.innerHTML;
     submitBtn.disabled = true;
     submitBtn.innerHTML = `
@@ -1351,6 +1368,7 @@
       <span class="spinner-border spinner-border-sm ms-2"></span>
     `;
     
+    // SEMUA PROSES MENGGUNAKAN AWAIT
     try {
       const formData = {};
       Object.keys(CONFIG.googleForm.entryIds).forEach(key => {
@@ -1358,17 +1376,29 @@
         formData[key] = element ? (element.value || '') : '';
       });
       
+      // PASTIKAN LINK FOTO MASUK KE DATA
+      if (!formData.link_foto && linkFoto) {
+        formData.link_foto = linkFoto;
+        console.log('✅ Link foto dimasukkan ke data form:', linkFoto);
+      }
+      
+      console.log('📤 Mengirim data ke Google Form...');
       await submitToGoogleForm(formData);
       
+      // TUNGGU SAMPAI SELESAI SEBELUM RESET
       document.getElementById('successAlert').classList.remove('d-none');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       
-      setTimeout(() => {
-        resetForm();
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-        showNotification('Data Terkirim', 'Data berhasil dikirim ke Google Forms.', 'success');
-      }, 2000);
+      // Simpan data yang berhasil dikirim
+      saveSubmittedData(formData);
+      
+      // Delay untuk feedback visual
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      resetForm();
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalText;
+      showNotification('Data Terkirim', 'Data berhasil dikirim ke Google Forms.', 'success');
       
     } catch (error) {
       console.error('Submit error:', error);
@@ -1377,10 +1407,13 @@
       document.getElementById('errorAlert').classList.remove('d-none');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       
+      showNotification('Gagal Mengirim', error.message, 'error');
+      
+    } finally {
+      // RESET FLAG SUBMIT
+      isSubmitting = false;
       submitBtn.disabled = false;
       submitBtn.innerHTML = originalText;
-      
-      showNotification('Gagal Mengirim', error.message, 'error');
     }
   });
 
@@ -1409,6 +1442,15 @@
   async function submitToGoogleForm(formData) {
     return new Promise((resolve, reject) => {
       try {
+        console.log('📋 Data yang akan dikirim ke Google Form:', formData);
+        
+        // PASTIKAN LINK FOTO TERMASUK
+        if (!formData.link_foto) {
+          console.warn('⚠️ Tidak ada link foto dalam data form');
+        } else {
+          console.log('✅ Link foto akan dikirim:', formData.link_foto);
+        }
+        
         const formUrl = `https://docs.google.com/forms/d/e/${CONFIG.googleForm.id}/formResponse`;
         
         const hiddenForm = document.createElement('form');
@@ -1424,6 +1466,8 @@
             input.name = entryId;
             input.value = formData[fieldName];
             hiddenForm.appendChild(input);
+            
+            console.log(`  ↳ ${fieldName}: ${formData[fieldName]}`);
           }
         });
         
@@ -1435,18 +1479,43 @@
         hiddenForm.target = 'googleformiframe';
         document.body.appendChild(hiddenForm);
         
+        console.log('🚀 Mengirim form ke Google...');
         hiddenForm.submit();
         
+        // TUNGGU KONFIRMASI PENGIRIMAN
         setTimeout(() => {
           document.body.removeChild(hiddenForm);
           document.body.removeChild(iframe);
+          console.log('✅ Form berhasil dikirim ke Google');
           resolve();
-        }, 1000);
+        }, 2000); // Tambah timeout untuk memastikan
         
       } catch (error) {
-        reject(error);
+        console.error('❌ Error mengirim ke Google Form:', error);
+        reject(new Error(`Gagal mengirim ke Google Form: ${error.message}`));
       }
     });
+  }
+
+  // Simpan data yang sudah berhasil dikirim
+  function saveSubmittedData(formData) {
+    try {
+      const submissions = JSON.parse(localStorage.getItem('submitted_data') || '[]');
+      submissions.push({
+        data: formData,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Simpan maksimal 50 submission terakhir
+      if (submissions.length > 50) {
+        submissions.shift();
+      }
+      
+      localStorage.setItem('submitted_data', JSON.stringify(submissions));
+      console.log('💾 Data tersimpan di local storage');
+    } catch (error) {
+      console.error('Gagal menyimpan data:', error);
+    }
   }
 
   // ==================== 10. FORM MANAGEMENT ====================
